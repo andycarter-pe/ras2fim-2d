@@ -1,4 +1,4 @@
-# Setting up ras2fim-2d code base to run in a miniconda environment
+# Setting up ras2fim-2d code base to run in a Linux miniconda environment
 
 # Use the Miniconda base image from Continuum
 FROM continuumio/miniconda3:latest
@@ -14,10 +14,14 @@ RUN conda install -y gdal && \
     pip install geopandas rioxarray h5py networkx scipy matplotlib
 	
 # Install Git to clone repository and nano (text editor)
-RUN apt-get update && apt-get install -y git nano s3fs
+RUN apt-get update && apt-get install -y git nano wget
 
 # Clone the desired GitHub repository
 RUN git clone https://github.com/andycarter-pe/ras2fim-2d.git /ras2fim-2d
+
+# Download files from a public S3 bucket
+RUN wget https://ras2fim-2d-global-inputs.s3.us-east-1.amazonaws.com/LimitingDischarge.csv -O /global_input/LimitingDischarge.csv
+RUN wget https://ras2fim-2d-global-inputs.s3.us-east-1.amazonaws.com/nextgen_12.gpkg -O /global_input/nextgen_fabric.gpkg
 
 # Set working directory
 WORKDIR /ras2fim-2d/src
