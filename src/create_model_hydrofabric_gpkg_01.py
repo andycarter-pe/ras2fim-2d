@@ -196,9 +196,11 @@ def fn_create_upstream_flowpath_points(gdf_flowpath_with_attrib, gdf_2d_area_pol
 
     for index,row in gdf_flowpath_with_attrib.iterrows():
 
-        geom_items = row['geometry']
+        #geom_items = row['geometry']
+        geom = row['geometry']
         list_id.append(row['id'])
-
+        
+        ''' Removed 2025.01.29
         for geom in geom_items:
             # Check if the geometry is a LineString or MultiLineString
             if geom.geom_type == 'LineString':
@@ -208,6 +210,18 @@ def fn_create_upstream_flowpath_points(gdf_flowpath_with_attrib, gdf_2d_area_pol
                 for part in geom:
                     endpoint = Point(part.coords[0])  # Get the beginning of each part
                     list_upstream_points.append(endpoint)
+        '''
+        # Handle MultiLineString and LineString cases
+        if isinstance(geom, LineString):
+            endpoint = Point(geom.coords[0])  # Get the start point
+            list_upstream_points.append(endpoint)
+        elif isinstance(geom, MultiLineString):
+            for part in geom.geoms:  # Extract individual LineStrings
+                endpoint = Point(part.coords[0])
+                list_upstream_points.append(endpoint)
+        else:
+            print(f"Unexpected geometry type: {type(geom)}")
+        
 
     # Create a new GeoDataFrame from the points
     gdf_upstream_points = gpd.GeoDataFrame(geometry=list_upstream_points, crs=gdf_flowpath_with_attrib.crs)
@@ -953,7 +967,8 @@ if __name__ == '__main__':
 
     fn_create_models_nextgen_gpkg(str_config_file_path,
                                   str_hdf_file_path,
-                                  str_output_dir)
+                                  str_output_dir,
+                                  b_print_output)
 
     flt_end_run = time.time()
     flt_time_pass = (flt_end_run - flt_start_run) // 1
