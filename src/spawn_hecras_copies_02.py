@@ -1244,6 +1244,15 @@ def fn_str_to_bool(value):
         raise argparse.ArgumentTypeError(f"Boolean value expected. Got '{value}'.")
 # ----------------
 
+# ---------
+def fn_normalize_mixed_path(mixed_path: str) -> str:
+    # Check if path starts with a Linux-style root
+    if mixed_path.startswith("/"):
+        # Convert backslashes to forward slashes
+        return mixed_path.replace("\\", "/")
+    return mixed_path  # Return as is if it's not Linux-style at the start
+# ---------
+
 
 # .........................................................
 def fn_spawn_hecras_copies(str_config_file_path,
@@ -1311,7 +1320,9 @@ def fn_spawn_hecras_copies(str_config_file_path,
         # Create the folder were the copies will be placed
         if not os.path.exists(str_proj_folder_path):
             os.makedirs(str_proj_folder_path)
-            
+        
+        str_proj = fn_normalize_mixed_path(str_proj)
+        
         str_copy_to_filepath = os.path.join(str_proj_folder_path, os.path.basename(str_proj))
         
         # Copy from str_proj to str_copy_to_filepath
