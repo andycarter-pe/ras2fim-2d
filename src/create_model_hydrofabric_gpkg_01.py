@@ -489,7 +489,7 @@ def fn_end_node_and_travel_time(gdf_points,gdf_streams):
         gdf_filtered_stream_sorted = gdf_filtered_stream_sorted[gdf_filtered_stream_sorted['tot_drainage_areasqkm'] >= flt_drainage_area]
 
         # Explore the sorted GeoDataFrame
-        gdf_filtered_stream_sorted.explore()
+        #gdf_filtered_stream_sorted.explore()
 
         # Initialize the total travel time
         flt_total_time = 0
