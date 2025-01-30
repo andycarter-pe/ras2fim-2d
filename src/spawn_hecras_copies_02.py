@@ -405,7 +405,9 @@ def fn_create_prj(str_run_name, str_project_path, str_new_folder):
     str_prj_file_name = str_run_name + ".prj" 
 
     str_prj_fullpath = os.path.join(str_new_folder, str_prj_file_name)
-    with open(str_prj_fullpath, 'w') as file:
+    
+    # Revised to "newline='\r\n'" to write CRLF windows format
+    with open(str_prj_fullpath, 'w', newline='\r\n') as file:
         file.write(str_file_body)
 # ----------------------
 
@@ -573,6 +575,7 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
 
 
 # ===========================
+# revised this function to assume that spawning is happening on a Linux machine - 2025.01.29
 def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, str_source_geom_hdf):
     # Define the path for the new subfolder
     source_terrain_path = os.path.join(str_folder_for_copies, str_new_terain_folder_name)
