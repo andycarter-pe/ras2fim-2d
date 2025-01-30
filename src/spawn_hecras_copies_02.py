@@ -574,7 +574,6 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
 
 # ===========================
 def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, str_source_geom_hdf):
-    
     # Define the path for the new subfolder
     source_terrain_path = os.path.join(str_folder_for_copies, str_new_terain_folder_name)
 
@@ -582,14 +581,11 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
     if os.path.exists(source_terrain_path):
         try:
             shutil.rmtree(source_terrain_path)
-            #print(f"Removed existing directory: {source_terrain_path}")
+            # print(f"Removed existing directory: {source_terrain_path}")
         except Exception as e:
             print(f"Error removing existing directory: {e}")
             # Exit the function if the directory removal fails
             exit(1)
-
-    # Create the folder where the copies will be placed
-    #os.makedirs(source_terrain_path)
 
     # Check if the source geometry HDF exists
     if os.path.exists(str_source_geom_hdf):
@@ -604,6 +600,10 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             # Get the directory of the HDF file and the absolute terrain path
             hdf_dir = os.path.dirname(str_source_geom_hdf)
             
+            # Remove leading './' or '.' if it exists in str_terrain_filename for correct Linux path behavior
+            str_terrain_filename = str_terrain_filename.lstrip('./')
+
+            # Now construct the absolute terrain path correctly
             absolute_terrain_path = os.path.abspath(os.path.join(hdf_dir, str_terrain_filename))
 
             # Get the absolute folder and the filename of the terrain
@@ -621,7 +621,7 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
                 # Copy everything from the terrain directory to the new source_terrain_path
                 try:
                     shutil.copytree(absolute_terrain_dir, source_terrain_path)
-                    #print(f"Copied terrain files from {absolute_terrain_dir} to {source_terrain_path}")
+                    # print(f"Copied terrain files from {absolute_terrain_dir} to {source_terrain_path}")
                 except Exception as e:
                     print(f"Error copying terrain files: {e}")
             else:
@@ -629,7 +629,7 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
     else:
         print(f"Source geom HDF not found: {str_source_geom_hdf}")
         
-    return(absolute_terrain_basename)
+    return absolute_terrain_basename
 # ===========================
 
 
