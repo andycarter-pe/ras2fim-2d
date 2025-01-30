@@ -611,6 +611,8 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
 
             # Get the directory of the HDF file and the absolute terrain path
             hdf_dir = os.path.dirname(str_source_geom_hdf)
+            print('hdf_dir: ' + hdf_dir)
+            
             absolute_terrain_path = os.path.abspath(os.path.join(hdf_dir, str_terrain_filename))
 
             # Get the absolute folder and the filename of the terrain
