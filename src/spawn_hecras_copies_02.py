@@ -226,7 +226,7 @@ def fn_set_plan_simulation_date_range(str_copy_to_p_full_path,
         lines[index] = "Simulation Date=" + str_simulation_range + "\n"  # Replace Simulation Date
 
     # Write the modified lines back to the file
-    with open(str_copy_to_p_full_path, "w") as file:
+    with open(str_copy_to_p_full_path, "w", newline='\r\n') as file:
         file.writelines(lines)
 # ***************
 
@@ -441,7 +441,7 @@ def fn_adjust_plan(str_run_name,
         lines[index] = "Geom File=g01\n"
 
     # Write the modified lines back to the file
-    with open(str_plan_fullpath, "w") as file:
+    with open(str_plan_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 
     # ---------------------
@@ -459,7 +459,7 @@ def fn_adjust_plan(str_run_name,
         lines[index] = "Flow File=u01\n"
 
     # Write the modified lines back to the file
-    with open(str_plan_fullpath, "w") as file:
+    with open(str_plan_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 
     # ---------------------
@@ -486,7 +486,7 @@ def fn_adjust_plan(str_run_name,
         lines[index] = "Short Identifier=" + dict_flows['short_name'] + "\n"
 
     # Write the modified lines back to the file
-    with open(str_plan_fullpath, "w") as file:
+    with open(str_plan_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 
     fn_set_plan_simulation_date_range(str_plan_fullpath,
@@ -521,7 +521,7 @@ def fn_adjust_geom(str_run_name, str_new_folder, dict_flows):
         lines[index] = "Geom Title=" + str_run_name + '_geom' + "\n"
 
     # Write the modified lines back to the file
-    with open(str_geom_fullpath, "w") as file:
+    with open(str_geom_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 # .................
 
@@ -550,7 +550,7 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
         lines[index] = "Interval=1HOUR\n"  # Replace the line with "Interval=1HOUR"
 
     # Write the modified lines back to the file
-    with open(str_flow_fullpath, "w") as file:
+    with open(str_flow_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 
     # --------------------- 
@@ -569,7 +569,7 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
         lines[index] = "Flow Title=" + str_run_name + '_unsteady_flow' + "\n"
 
     # Write the modified lines back to the file
-    with open(str_flow_fullpath, "w") as file:
+    with open(str_flow_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 # ----------------------
 
