@@ -575,12 +575,6 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
 # ===========================
 def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, str_source_geom_hdf):
     
-    print('+++++++++++++++')
-    print('str_folder_for_copies:'  + str_folder_for_copies)
-    print('str_new_terain_folder_name:'  + str_new_terain_folder_name)
-    print('str_source_geom_hdf:'  + str_source_geom_hdf)
-    print('+++++++++++++++')
-    
     # Define the path for the new subfolder
     source_terrain_path = os.path.join(str_folder_for_copies, str_new_terain_folder_name)
 
@@ -607,26 +601,25 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             # Retrieve and print the attribute value of "Terrain Filename"
             str_terrain_filename = geometry_group.attrs.get("Terrain Filename", b"Attribute not found").decode('utf-8')
             
-            print('str_terrain_filename: ' + str_terrain_filename)
-
             # Get the directory of the HDF file and the absolute terrain path
             hdf_dir = os.path.dirname(str_source_geom_hdf)
-            print('hdf_dir: ' + hdf_dir)
             
             absolute_terrain_path = os.path.abspath(os.path.join(hdf_dir, str_terrain_filename))
 
             # Get the absolute folder and the filename of the terrain
             absolute_terrain_dir = os.path.dirname(absolute_terrain_path)
             absolute_terrain_basename = os.path.basename(absolute_terrain_path)
+            
+            print('str_terrain_filename: ' + str_terrain_filename)
+            print('hdf_dir: ' + hdf_dir)
+            print('absolute_terrain_dir: ' + absolute_terrain_dir)
+            print('absolute_terrain_basename: ' + absolute_terrain_basename)
+            print('source_terrain_path: ' + source_terrain_path)
 
             # Check if the terrain directory exists
             if os.path.exists(absolute_terrain_dir):
                 # Copy everything from the terrain directory to the new source_terrain_path
                 try:
-                    print('absolute_terrain_dir: '+ absolute_terrain_dir)
-                    print('source_terrain_path: '+ source_terrain_path)
-                    print('+++++++++++++++')
-                    
                     shutil.copytree(absolute_terrain_dir, source_terrain_path)
                     #print(f"Copied terrain files from {absolute_terrain_dir} to {source_terrain_path}")
                 except Exception as e:
