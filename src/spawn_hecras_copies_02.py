@@ -616,12 +616,6 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             absolute_terrain_dir = os.path.dirname(absolute_terrain_path)
             absolute_terrain_basename = os.path.basename(absolute_terrain_path)
 
-            print('str_terrain_filename: ' + str_terrain_filename)
-            print('hdf_dir: ' + hdf_dir)
-            print('absolute_terrain_dir: ' + absolute_terrain_dir)
-            print('absolute_terrain_basename: ' + absolute_terrain_basename)
-            print('source_terrain_path: ' + source_terrain_path)
-
             # Check if the terrain directory exists
             if os.path.exists(absolute_terrain_dir):
                 # Copy everything from the terrain directory to the new source_terrain_path
