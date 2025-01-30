@@ -622,6 +622,10 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             if os.path.exists(absolute_terrain_dir):
                 # Copy everything from the terrain directory to the new source_terrain_path
                 try:
+                    print('absolute_terrain_dir: '+ absolute_terrain_dir)
+                    print('source_terrain_path: '+ source_terrain_path)
+                    print('+++++++++++++++')
+                    
                     shutil.copytree(absolute_terrain_dir, source_terrain_path)
                     #print(f"Copied terrain files from {absolute_terrain_dir} to {source_terrain_path}")
                 except Exception as e:
