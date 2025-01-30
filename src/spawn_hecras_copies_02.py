@@ -614,6 +614,9 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             # Get the absolute folder and the filename of the terrain
             absolute_terrain_dir = os.path.dirname(absolute_terrain_path)
             absolute_terrain_basename = os.path.basename(absolute_terrain_path)
+            
+            print('absolute_terrain_dir: '+ absolute_terrain_dir)
+            print('+++++++++++++++')
 
             # Check if the terrain directory exists
             if os.path.exists(absolute_terrain_dir):
