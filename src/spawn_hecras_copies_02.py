@@ -596,10 +596,13 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
 
             # Retrieve and print the attribute value of "Terrain Filename"
             str_terrain_filename = geometry_group.attrs.get("Terrain Filename", b"Attribute not found").decode('utf-8')
-            
+
+            # Normalize path (replace backslashes with forward slashes)
+            str_terrain_filename = str_terrain_filename.replace("\\", "/")
+
             # Get the directory of the HDF file and the absolute terrain path
             hdf_dir = os.path.dirname(str_source_geom_hdf)
-            
+
             # Remove leading './' or '.' if it exists in str_terrain_filename for correct Linux path behavior
             str_terrain_filename = str_terrain_filename.lstrip('./')
 
@@ -609,7 +612,7 @@ def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, st
             # Get the absolute folder and the filename of the terrain
             absolute_terrain_dir = os.path.dirname(absolute_terrain_path)
             absolute_terrain_basename = os.path.basename(absolute_terrain_path)
-            
+
             print('str_terrain_filename: ' + str_terrain_filename)
             print('hdf_dir: ' + hdf_dir)
             print('absolute_terrain_dir: ' + absolute_terrain_dir)
