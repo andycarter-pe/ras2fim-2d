@@ -200,7 +200,8 @@ def fn_ras2fim_2d(str_source_folder,
     
     # === Step 03
     if int_start_step <= 3 and int_end_step >= 3:
-        fn_run_hec_ras_models(str_config_file_path, str_output_dir)
+        #fn_run_hec_ras_models(str_config_file_path, str_output_dir)
+        print('  ** This step is removed on the Linux container **')
     
     
     

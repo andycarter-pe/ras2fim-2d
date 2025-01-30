@@ -745,6 +745,8 @@ def fn_process_wsel(str_wsel_col_name, gdf_cells_wsel,
         list_wsel_raster_path = fn_raster_addition_wsel(
             list_created_rasters[0], list_depth_raster_path[0], str_output_dir, str_wsel_col_name)
         
+        print('str_output_crs: ' + str_output_crs)
+        print('Begin nudge depth: 09...')
         # Nudge depth raster
         str_itermediate_raster_filepath = fn_set_nan(list_depth_raster_path[0])
         str_file_dir, str_file_name = os.path.split(str_itermediate_raster_filepath)
@@ -752,6 +754,7 @@ def fn_process_wsel(str_wsel_col_name, gdf_cells_wsel,
         str_output_path_depth = os.path.join(str_file_dir, str_output_filename)
         fn_nudge_raster(str_itermediate_raster_filepath, str_output_path_depth, str_output_crs, flt_desired_res)
         
+        print('Begin nudge wsel: 10...')
         # Nudge wsel raster
         str_itermediate_raster_filepath = fn_set_nan(list_wsel_raster_path[0])
         str_file_dir, str_file_name = os.path.split(str_itermediate_raster_filepath)
