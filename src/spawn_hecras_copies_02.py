@@ -575,6 +575,12 @@ def fn_adjust_unsteady_flow(str_run_name, str_new_folder, dict_flows):
 # ===========================
 def fn_copy_source_terrain(str_folder_for_copies, str_new_terain_folder_name, str_source_geom_hdf):
     
+    print('+++++++++++++++')
+    print('str_folder_for_copies:'  + str_folder_for_copies)
+    print('str_new_terain_folder_name:'  + str_new_terain_folder_name)
+    print('str_source_geom_hdf:'  + str_source_geom_hdf)
+    print('+++++++++++++++')
+    
     # Define the path for the new subfolder
     source_terrain_path = os.path.join(str_folder_for_copies, str_new_terain_folder_name)
 
