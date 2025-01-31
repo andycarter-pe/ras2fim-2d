@@ -20,7 +20,7 @@
 FROM continuumio/miniconda3:latest
 
 # Install apt-get packages first (if any)
-RUN apt-get update && apt-get install -y git nano wget
+RUN apt-get update && apt-get install -y git nano wget proj-bin
 
 # Set the Python version you want (3.8.12 in this case)
 RUN conda install python=3.8.12 -y
@@ -30,6 +30,9 @@ RUN conda install gdal -y
 
 # Install python libraries via pip
 RUN pip install geopandas==0.12.1 rioxarray==0.13.1 h5py==3.7.0 networkx==2.8.8 scipy==1.9.3 matplotlib
+
+# Install python libraries via pip
+RUN pip install fiona==1.8.22
 
 # Clean up conda cache to reduce image size
 RUN conda clean -a

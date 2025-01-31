@@ -211,6 +211,10 @@ def fn_nudge_raster(str_raster_path, str_output_path, str_crs, flt_res):
             src.crs, str_crs, src.width, src.height, *src.bounds
         )
         
+        # Debugging - 2025.01.30
+        print(f"Source CRS: {src.crs}")
+        print(f"Target CRS: {str_crs}")
+        
         # Update transform to match the desired resolution
         transform = from_origin(
             round(transform.c / flt_res) * flt_res,  # Nudge X to nearest multiple of flt_res
@@ -745,8 +749,6 @@ def fn_process_wsel(str_wsel_col_name, gdf_cells_wsel,
         list_wsel_raster_path = fn_raster_addition_wsel(
             list_created_rasters[0], list_depth_raster_path[0], str_output_dir, str_wsel_col_name)
         
-        print('str_output_crs: ' + str_output_crs)
-        print('Begin nudge depth: 09...')
         # Nudge depth raster
         str_itermediate_raster_filepath = fn_set_nan(list_depth_raster_path[0])
         str_file_dir, str_file_name = os.path.split(str_itermediate_raster_filepath)
