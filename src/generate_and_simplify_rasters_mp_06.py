@@ -227,11 +227,8 @@ def fn_create_raster_products(int_flow_step,
             for index, row in gdf_flowpath_limits_3857.iterrows():
                 geom = row['geometry']
                 
-                if geom is None or geom.is_empty:
-                    list_wsel_rasters.append('')
-                    # this segment has no geometry
-                else:
-                    # ----- create clpped wsel rasters -----
+                try:
+                    # ----- create clipped wsel rasters -----
                     xds_clipped_wsel = xds_wsel_raster.rio.clip([geom])
                     str_wsel_name = 'wsel_' + row['flowpath'] + '_' + str(row['flow_cfs']) + '.tif'
                     str_wsel_filepath = os.path.join(str_wsel_folder, str_wsel_name)
@@ -240,6 +237,8 @@ def fn_create_raster_products(int_flow_step,
                     xds_clipped_wsel.rio.to_raster(str_wsel_filepath,compress='lzw',dtype="float32")
     
                     list_wsel_rasters.append(str_wsel_filepath)
+                except:
+                    list_wsel_rasters.append('')
                 
             gdf_results['wsel_raster_path'] = list_wsel_rasters
         # ++++
