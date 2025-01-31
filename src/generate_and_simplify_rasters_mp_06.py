@@ -228,7 +228,7 @@ def fn_create_raster_products(int_flow_step,
                 geom = row['geometry']
                 
                 if geom is None or geom.is_empty:
-                    pass
+                    list_wsel_rasters.append('')
                     # this segment has no geometry
                 else:
                     # ----- create clpped wsel rasters -----
