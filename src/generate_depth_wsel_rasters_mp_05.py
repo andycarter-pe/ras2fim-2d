@@ -207,13 +207,16 @@ def fn_nudge_raster(str_raster_path, str_output_path, str_crs, flt_res):
     # Open the original raster
     with rasterio.open(str_raster_path) as src:
         # Calculate the transformation for the desired CRS
+        
+        # TODO -- there is a Linux PROJ issue with "str_crs" -- 2025.01.30
+        
         transform, width, height = calculate_default_transform(
             src.crs, str_crs, src.width, src.height, *src.bounds
         )
         
         # Debugging - 2025.01.30
-        print(f"Source CRS: {src.crs}")
-        print(f"Target CRS: {str_crs}")
+        #print(f"Source CRS: {src.crs}")
+        #print(f"Target CRS: {str_crs}")
         
         # Update transform to match the desired resolution
         transform = from_origin(
@@ -756,7 +759,7 @@ def fn_process_wsel(str_wsel_col_name, gdf_cells_wsel,
         str_output_path_depth = os.path.join(str_file_dir, str_output_filename)
         fn_nudge_raster(str_itermediate_raster_filepath, str_output_path_depth, str_output_crs, flt_desired_res)
         
-        print('Begin nudge wsel: 10...')
+        #print('Begin nudge wsel: 10...')
         # Nudge wsel raster
         str_itermediate_raster_filepath = fn_set_nan(list_wsel_raster_path[0])
         str_file_dir, str_file_name = os.path.split(str_itermediate_raster_filepath)

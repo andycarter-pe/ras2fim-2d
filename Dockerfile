@@ -32,7 +32,12 @@ RUN conda install gdal -y
 RUN pip install geopandas==0.12.1 rioxarray==0.13.1 h5py==3.7.0 networkx==2.8.8 scipy==1.9.3 matplotlib
 
 # Install python libraries via pip
+RUN pip uninstall -y fiona
 RUN pip install fiona==1.8.22
+
+# Fixing PROJ issues with rasterio - 2025.01.30
+RUN pip uninstall rasterio
+RUN conda install rasterio -y
 
 # Clean up conda cache to reduce image size
 RUN conda clean -a
