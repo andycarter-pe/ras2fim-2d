@@ -557,9 +557,9 @@ def fn_create_gdf_wet_cells(hdf_file_path, list_unique_indices_sorted):
         facepoints_data = hdf_file[str_cells_facepoint_indexes][:]
 
         # Extract the projection
-        ##projection_wkt = hdf_file.attrs['Projection'].decode('utf-8')
+        projection_wkt = hdf_file.attrs['Projection'].decode('utf-8')
         # TODO - 2024.11.22 **hardcoded**
-        projection_wkt = 'PROJCS["NAD_1983_StatePlane_Texas_Central_FIPS_4203_Feet",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic"],PARAMETER["False_Easting",2296583.333],PARAMETER["False_Northing",9842500.0],PARAMETER["Central_Meridian",-100.333333333333],PARAMETER["Standard_Parallel_1",31.8833333333333],PARAMETER["Standard_Parallel_2",30.1166666666667],PARAMETER["Latitude_Of_Origin",29.6666666666667],UNIT["US survey foot",0.304800609601219]]'
+        #projection_wkt = 'PROJCS["NAD_1983_StatePlane_Texas_Central_FIPS_4203_Feet",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic"],PARAMETER["False_Easting",2296583.333],PARAMETER["False_Northing",9842500.0],PARAMETER["Central_Meridian",-100.333333333333],PARAMETER["Standard_Parallel_1",31.8833333333333],PARAMETER["Standard_Parallel_2",30.1166666666667],PARAMETER["Latitude_Of_Origin",29.6666666666667],UNIT["US survey foot",0.304800609601219]]'
 
     # Create a GeoDataFrame to store the polygons
     geometry = []
@@ -856,7 +856,7 @@ def fn_add_time_values_to_buffers_in_flowpath(gdf_cells_with_runs,
     
     # List comprehension to find columns that start with 'wsel_max_'
     wsel_columns = [col for col in gdf_cells_with_runs.columns if col.startswith('wsel_max_')]
-
+    
     # For each gdf_buffers_in_flowpath
 
     # get the 'time to stable' for each buffered flowpath, the count of cells in the area
@@ -873,6 +873,7 @@ def fn_add_time_values_to_buffers_in_flowpath(gdf_cells_with_runs,
     for i in range(len(wsel_columns)):
         str_wsel_col_name = 'wsel_max_' + str(i+1)
         str_stable_hr_name = 'hours_to_stable_' + str(i+1)
+        
 
         # reset each loop
         highest_hours = []
@@ -883,7 +884,7 @@ def fn_add_time_values_to_buffers_in_flowpath(gdf_cells_with_runs,
         for index, row in gdf_buffers_in_flowpath.iterrows():
             # Intersect the polygon geometry with gdf_cells_wsel
             intersected_cells = gdf_cells_with_runs[gdf_cells_with_runs.intersects(row['geometry'])]
-
+            
             # Filter to all the rows in intersected_cells that have values in str_wsel_col_name that are not NaN
             # These are the 'wet' cells for the given run, for a given stream
             wet_cells_in_stream_poly = intersected_cells[intersected_cells[str_wsel_col_name].notna()]
@@ -905,15 +906,14 @@ def fn_add_time_values_to_buffers_in_flowpath(gdf_cells_with_runs,
                 lowest_hours.append(None)
                 cell_count.append(0)
                 negative_one_count.append(0)
-
+            
         # lists of lists (for each run)
         list_of_highest_hours.append(highest_hours)
         list_of_lowest_hours.append(lowest_hours)
         list_of_cell_count.append(cell_count)
         list_of_negative_one_count.append(negative_one_count)
 
-    # for all the runs in the simulation, this should be a list of lists ()
-    
+
     df_highest_hr = fn_df_from_list_of_lists(list_of_highest_hours, 'highest_hr_to_stable')
     df_lowest_hr = fn_df_from_list_of_lists(list_of_lowest_hours, 'lowest_hr_to_stable')
     df_cell_count = fn_df_from_list_of_lists(list_of_cell_count, 'cell_count')
@@ -1248,10 +1248,11 @@ def fn_compute_max_wsel_and_stable_hr(str_config_file_path,
             print('Extracting cell geometry...')
         gdf_cells = fn_create_gdf_wet_cells(str_hdf_file_path, list_unique_indices_sorted)
         
-        #print()
+
         #print('Step 5')
         # Compute the centroid for every cell's polygon
         gdf_cells['geom_centroid'] = gdf_cells.geometry.centroid
+        
         
         if b_print_output:
             print()
@@ -1263,6 +1264,8 @@ def fn_compute_max_wsel_and_stable_hr(str_config_file_path,
                                                                                                       flt_mainstem,
                                                                                                       gpkg_path,
                                                                                                       int_buffer_cells)
+        
+        
         if b_print_output:
             #print('Step 7')
             print()

@@ -195,15 +195,19 @@ def fn_create_raster_products(int_flow_step,
                 for index, row in gdf_flowpath_limits_3857.iterrows():
                     geom = row['geometry']
                     
-                    # ----- create clipped depth rasters-----
-                    xds_clipped_depth = xds_depth_raster.rio.clip([geom])
-                    str_depth_name = 'depth_' + row['flowpath'] + '_' + str(row['flow_cfs']) + '.tif'
-                    str_depth_filepath = os.path.join(str_depth_folder, str_depth_name)
-                
-                    # compress and write out depth raster as unsigned 16 bit integer
-                    xds_clipped_depth.rio.to_raster(str_depth_filepath,compress='lzw',dtype="uint16")
+                    # Added try as sometimes the polygon and raster don't overlap - 2025.01.31
+                    try:
+                        # ----- create clipped depth rasters-----
+                        xds_clipped_depth = xds_depth_raster.rio.clip([geom])
+                        str_depth_name = 'depth_' + row['flowpath'] + '_' + str(row['flow_cfs']) + '.tif'
+                        str_depth_filepath = os.path.join(str_depth_folder, str_depth_name)
                     
-                    list_depth_rasters.append(str_depth_filepath)
+                        # compress and write out depth raster as unsigned 16 bit integer
+                        xds_clipped_depth.rio.to_raster(str_depth_filepath,compress='lzw',dtype="uint16")
+                        
+                        list_depth_rasters.append(str_depth_filepath)
+                    except:
+                        list_depth_rasters.append('')
                     
                 gdf_results['depth_raster_path'] = list_depth_rasters
         # ====
@@ -227,6 +231,7 @@ def fn_create_raster_products(int_flow_step,
             for index, row in gdf_flowpath_limits_3857.iterrows():
                 geom = row['geometry']
                 
+                # Added try as sometimes the polygon and raster don't overlap - 2025.01.31
                 try:
                     # ----- create clipped wsel rasters -----
                     xds_clipped_wsel = xds_wsel_raster.rio.clip([geom])

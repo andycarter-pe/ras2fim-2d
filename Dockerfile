@@ -19,10 +19,10 @@
 # Use the Miniconda base image from Continuum
 FROM continuumio/miniconda3:latest
 
-# Install apt-get packages first (if any)
+# Install apt-get packages first
 RUN apt-get update && apt-get install -y git nano wget proj-bin
 
-# Set the Python version you want (3.8.12 in this case)
+# Set the Python version (3.8.12 in this case)
 RUN conda install python=3.8.12 -y
 
 # Install the latest gdal via conda
@@ -36,8 +36,11 @@ RUN pip uninstall -y fiona
 RUN pip install fiona==1.8.22
 
 # Fixing PROJ issues with rasterio - 2025.01.30
-RUN pip uninstall rasterio
+RUN pip uninstall -y rasterio
 RUN conda install rasterio -y
+
+# Making sure xarray has netcdf4 backend engines
+RUN pip install netcdf4 h5netcdf
 
 # Clean up conda cache to reduce image size
 RUN conda clean -a
