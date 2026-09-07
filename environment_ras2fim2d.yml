@@ -1,0 +1,21 @@
+name: ras2fim2d
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.8.12
+  - gdal
+  - rasterio
+  - pip
+  - pip:
+      - geopandas==0.12.1
+      - rioxarray==0.13.1
+      - h5py==3.7.0
+      - networkx==2.8.8
+      - scipy==1.9.3
+      - matplotlib
+      - fiona==1.8.22
+      - netcdf4
+      - h5netcdf
