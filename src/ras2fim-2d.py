@@ -101,6 +101,24 @@ def fn_copy_ras_hdf_plans(str_model_path_02, str_hdf_path_03):
 # ..................        
 
 
+# ++++++++++++++++++++++++
+def fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03):
+    str_hdf_path_03.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for src in sorted(str_model_path_02b.rglob("*.p01.tmp.hdf")):
+        # strip the ".tmp" so "<name>.p01.tmp.hdf" -> "<name>.p01.hdf"
+        new_name = src.name.replace(".p01.tmp.hdf", ".p01.hdf")
+        dst = str_hdf_path_03 / new_name
+        if dst.exists():
+            #print(f"SKIP (exists): {dst.name}")
+            continue
+        shutil.copy2(src, dst)   # copy2 preserves timestamps
+        copied += 1
+        #print(f"COPIED: {src}  ->  {dst.name}")
+    #print(f"\nDone. Copied {copied} file(s) to {DST_DIR}")
+# ++++++++++++++++++++++++
+
+
 # -------------------
 def fn_determine_tif_in_dir_with_largest_bbox(str_terrain_folder):
     
@@ -273,6 +291,8 @@ def fn_ras2fim_2d(str_source_folder,
     
     # Prepare arguments for multiprocessing
     args = [(str_config_file_path, hdf_filepath, str_model_hydrofabric_path_01, str_output_step_04, b_print_output) for hdf_filepath in list_hdf_filepath]
+    
+    fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03)
     
     # === Step 04
     if int_start_step <= 4 and int_end_step >= 4:
