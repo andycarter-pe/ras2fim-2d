@@ -23,6 +23,7 @@ import multiprocessing as mp
 from functools import partial
 import tqdm
 import platform
+from pathlib import Path
 
 # Import modules
 from copy_source_folder_00 import fn_copy_folder
@@ -102,19 +103,20 @@ def fn_copy_ras_hdf_plans(str_model_path_02, str_hdf_path_03):
 
 
 # ++++++++++++++++++++++++
-def fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03):
+def fn_copy_results_from_02b_to_03(str_model_path_02b, str_hdf_path_03):
+    path_model_02b = Path(str_model_path_02b)
+    path_hdf_03 = Path(str_hdf_path_03)
+
     copied = 0
-    for src in sorted(str_model_path_02b.rglob("*.p01.tmp.hdf")):
+    for src in sorted(path_model_02b.rglob("*.p01.tmp.hdf")):
         # strip the ".tmp" so "<name>.p01.tmp.hdf" -> "<name>.p01.hdf"
         new_name = src.name.replace(".p01.tmp.hdf", ".p01.hdf")
-        dst = str_hdf_path_03 / new_name
+        dst = path_hdf_03 / new_name
         if dst.exists():
-            #print(f"SKIP (exists): {dst.name}")
             continue
         shutil.copy2(src, dst)   # copy2 preserves timestamps
         copied += 1
-        #print(f"COPIED: {src}  ->  {dst.name}")
-    #print(f"\nDone. Copied {copied} file(s) to {DST_DIR}")
+    print(f"Done. Copied {copied} file(s) to {path_hdf_03}")
 # ++++++++++++++++++++++++
 
 
