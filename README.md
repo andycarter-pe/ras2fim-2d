@@ -4,8 +4,10 @@
 <img src="/doc/ras2fim2d-logo-20260907.png" align="right"
      alt="ras2fim2d logo" width="160" height="160">
 
-**Description**:  LISFLOOD2FIM creates Flood Inundation Maps (FIMs) indexed to various excess rainfall rates for a given catchment (watershed). The initial routine determines the stream network on which to apply the excess precipitation. This requires hydro-enforcement through dams and roadways. Input data needed for LISFLOOD-FP is then created, including parameters, terrain, boundary conditions, and stream-centric rainfall..<br><br>
-Simulations are run using LISFLOOD-FP v8.1.0 to a point of “stability,” where inflow rainfall equals the outflow rate. This process is repeated for various excess rainfall intensities. The resulting “stable” flood depths for each intensity are aggregated into a single data cube (NetCDF), representing flood depth across multiple intensities over the watershed. <br><br>
+**Description**:  RAS2FIM-2D convert 2D HEC-RAS models into a set of flood inundation mapping (fim) library of rasters (netCDF) for a corresponding National Water Model (NWM) NextGEN stream segments within the HEC-RAS model's 2D area.<br><br>
+Simulations are run to a points of stability using a "firehose" method where a series of constant flows is set on an internal boundary condition ("Emitter1") <br><br>
+Flows are emmitted at the upsteram ends of the NextGEN hydrofabric catchments and clipped to flooding around a given NextGEN id (Example: wb-2427467).  The ultimate output is a netCDF of 
+multiple water surface elevations (WSEL) indexed to multiple flow rates in cfs.  The netCDF file also contains the source terrain on which the WSEL were determined.<br><br>
 These scripts were developed in support of the National Weather Service (Research Project NA22NWS4320003 / A25-0366-S018).
 
 <p align="center">
@@ -15,6 +17,18 @@ These scripts were developed in support of the National Weather Service (Researc
   - **Technology stack**: Scripts were all developed in Python 3.8.12<br>
   - **Status**:  Version 0.1- Preliminary release. (2026.09.07)<br>
   - **Related Projects**: Flood Inundation Maps from HEC-RAS 1D models  https://github.com/NOAA-OWP/ras2fim<br>
+  
+## HEC-RAS 2D Requirements
+  - **Internal BC**: An internal boundary condition named "Emitter1" must be present in the 2D area<br>
+  - **Flow Hydrograph**:  Flow hydrogrph for "Emitter1" must be set to 'Use Simulation Time'<br>
+  - **Computation Interval**:  Spawned runs inherit computation interval from base HEC-RAS unsteady plan<br>
+  - **Projection File**:  The projection file should be a folder where the base HEC-RAS exists<br>
+  - **Terrain File**:  The terrain file should be a folder where the base HEC-RAS exists<br>
+  
+Note that a sample HEC-RAS input file is provided in this repository.
+ 
+```
+docker build -t ras2fim2d .
   
 ## Dockerfile
 To build a container from this repository, clone to your local drive and build with the following command
