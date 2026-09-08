@@ -22,13 +22,18 @@ import rioxarray as rxr
 import multiprocessing as mp
 from functools import partial
 import tqdm
+import platform
 
 # Import modules
 from copy_source_folder_00 import fn_copy_folder
 from create_model_hydrofabric_gpkg_01 import fn_create_models_nextgen_gpkg
 from spawn_hecras_copies_emit_02 import fn_spawn_hecras_copies
-from stage_hecras_for_linux_v66_02b import fn_prepare_hecras_for_linux
-from create_hec_ras_scripts_for_linux_02c import fn_hec_ras_scripts_for_linux
+
+if platform.system() == "Windows":
+    import win32com.client
+    from stage_hecras_for_linux_v66_02b import fn_prepare_hecras_for_linux
+    from create_hec_ras_scripts_for_linux_02c import fn_hec_ras_scripts_for_linux
+    
 ##from run_hecras_windows_03 import fn_run_hec_ras_models
 from compute_max_wsel_and_stable_hr_04 import fn_compute_max_wsel_and_stable_hr
 from determine_fim_per_reach_04b import fn_determine_fims_per_reach
@@ -207,21 +212,21 @@ def fn_ras2fim_2d(str_source_folder,
                                b_print_output)
         
         
+        if platform.system() == "Windows":
+            # Step 02b -- stage for HEC-RAS v6.6 on Windows machine
         
-        # Step 02b -- stage for HEC-RAS v6.6 on Windows machine
-        
-        int_processes = 4 # number of HEC-RAS to run concurrently on Windows machine
-        flt_timeout_sec = 900 # per-project timeout in seconds
-        
-        fn_prepare_hecras_for_linux(str_config_file_path,
-                                    str_model_path_02,
-                                    str_model_path_02b,
-                                    int_processes,
-                                    flt_timeout_sec,
-                                    b_print_output)
-        
-        # Step 02c -- create scripts to run HEC-RAS Linux Container (docker)
-        fn_hec_ras_scripts_for_linux(str_model_path_02b, b_print_output)
+            int_processes = 4 # number of HEC-RAS to run concurrently on Windows machine
+            flt_timeout_sec = 900 # per-project timeout in seconds
+            
+            fn_prepare_hecras_for_linux(str_config_file_path,
+                                        str_model_path_02,
+                                        str_model_path_02b,
+                                        int_processes,
+                                        flt_timeout_sec,
+                                        b_print_output)
+            
+            # Step 02c -- create scripts to run HEC-RAS Linux Container (docker)
+            fn_hec_ras_scripts_for_linux(str_model_path_02b, b_print_output)
         
     
     # === Step 03
