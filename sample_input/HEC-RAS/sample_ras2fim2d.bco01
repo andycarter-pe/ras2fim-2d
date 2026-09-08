@@ -14,7 +14,7 @@ Short ID:      sample_plan
 
 Starting Time:   31Dec1999 2400
 
-Ending Time:     01Jan2000 0400
+Ending Time:     01Jan2000 0300
 
 
                 ################################################
@@ -25,7 +25,7 @@ Ending Time:     01Jan2000 0400
                 #                                              #
                 #          HEC-RAS 6.6 September 2024          #
                 #                                              #
-                #             07SEP26 at 20:43:26              #
+                #             07SEP26 at 21:02:55              #
                 #                                              #
                 ################################################
                 
@@ -49,22 +49,22 @@ Ending Time:     01Jan2000 0400
            *******    ************      **********      **********     ***********           *****   *************
  
  
-       Perimeter 1                           163.3           330.6           167.3    0.0000111356    0.0000033685
+       Perimeter 1                           162.4           247.9           85.49    0.0000127119    0.0000051271
 
 
 
                  ***   Total Volume Accounting (for the entire model) in Acre Feet   ***
 
-Total Boundary Flux of Water In            330.6
-Total Boundary Flux of Water Out           167.3
+Total Boundary Flux of Water In            247.9
+Total Boundary Flux of Water Out           85.49
 
 Starting Volume                     0.0000000000
-Ending Volume                              163.3
+Ending Volume                              162.4
 
 
                              Error   Percent Error
                              *****   *************
-                      0.0000111356    0.0000033685
+                      0.0000127119    0.0000051271
 
 
 

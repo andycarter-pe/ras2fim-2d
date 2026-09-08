@@ -45,7 +45,7 @@ Job Control Information
 c:\Users\civil\dev\ras2fim_2d_20260907\sample_input\HEC-RAS\sample_ras2fim2d.dss
 Computational Time Window
   Start Date/Time       = 31Dec1999 2400
-  End Date/Time         = 01Jan2000 0400
+  End Date/Time         = 01Jan2000 0300
 Initial Conditions (use restart file?)
        F
 Log File Information
