@@ -77,15 +77,12 @@ RAS2FIM-2D uses Docker to provide a reproducible processing environment. The wor
 ## HEC-RAS 6.5 Docker Image
 
 A pre-built HEC-RAS 6.5 Docker image is available on Docker Hub:
-
-```text
-civileng127/ras_v65
-```
+**[Docker Hub HEC-RAS Linux v6.5](https://hub.docker.com/r/civileng127/ras_v65)**
 
 Pull the image with:
 
 ```bash
-docker pull civileng127/ras_v65
+docker pull civileng127/ras_v65:v0
 ```
 This container provides the HEC-RAS 6.5 runtime to execute the 2D unsteady simulations in a Linux environment.
 
