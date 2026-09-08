@@ -1,8 +1,10 @@
-# RAS2FIM-2D
+# RAS2FIM-2D <img src="doc/Logo_CWE.png" align="right" alt="ras2fim2d agency" height="80"> <br> <br>
 
-## *Flood Inundation Mapping using HEC-RAS 2D*
+## <i>Flood Inundation Mapping using HEC-RAS 2D</i>
 
-![RAS2FIM-2D logo](https://github.com/andycarter-pe/ras2fim-2d/raw/main/doc/ras2fim2d-logo-20260907.png)
+
+<img src="doc/ras2fim2d-logo-20260907.png" align="right"
+     alt="lisflood2fim logo" width="160" height="160">
 
 **RAS2FIM-2D** converts 2D HEC-RAS models into flood inundation mapping (FIM) libraries for National Water Model (NWM) NextGen stream segments represented within the HEC-RAS model's 2D computational area.
 
@@ -146,6 +148,8 @@ docker run -it ^
 ```
 
 > The `^` characters are Windows line-continuation and are optional — the command can be entered on a single line.
+
+---
 
 ## Phase 2 — Run HEC-RAS 2D (Windows) to create the temp HDF files to send to Linux Docker
 
