@@ -87,8 +87,7 @@ Pull the image with:
 ```bash
 docker pull civileng127/ras_v65
 ```
-
-This container provides the HEC-RAS 6.5 runtime used by RAS2FIM-2D to execute the 2D unsteady simulations.
+This container provides the HEC-RAS 6.5 runtime to execute the 2D unsteady simulations in a Linux environment.
 
 ## Build the RAS2FIM-2D Image
 
