@@ -1,11 +1,8 @@
-# RAS2FIM-2D <img src="doc/Logo_CWE.png" align="right" alt="Center for Water and the Environment" height="80">
-
-<br clear="right">
+# RAS2FIM-2D
 
 ## *Flood Inundation Mapping using HEC-RAS 2D*
 
-<img src="/doc/ras2fim2d-logo-20260907.png" align="right"
-     alt="RAS2FIM-2D logo" width="160" height="160">
+![RAS2FIM-2D logo](https://github.com/andycarter-pe/ras2fim-2d/raw/main/doc/ras2fim2d-logo-20260907.png)
 
 **RAS2FIM-2D** converts 2D HEC-RAS models into flood inundation mapping (FIM) libraries for National Water Model (NWM) NextGen stream segments represented within the HEC-RAS model's 2D computational area.
 
@@ -15,22 +12,26 @@ The resulting FIM library contains water-surface elevations (WSEL) indexed by fl
 
 This project was developed in support of the National Weather Service under **Research Project NA22NWS4320003 / A25-0366-S018**.
 
-<p align="center">
-  <img src="/doc/ras2fim_animation.gif" alt="RAS2FIM-2D example" width="85%">
-</p>
+![RAS2FIM-2D example](https://github.com/andycarter-pe/ras2fim-2d/raw/main/doc/ras2fim_animation.gif)
+
+---
 
 ## Status
 
-**Version:** 0.1 — Preliminary release  
+**Version:** 0.1 — Preliminary release
 **Release date:** 2026-09-07
+
+---
 
 ## Technology
 
 - Python 3.8.12
-- HEC-RAS 2D
+- HEC-RAS 2D (v6.6 local Windows install; v6.5 containerized workers)
 - Docker
 - NetCDF
 - GDAL / raster processing libraries
+
+---
 
 ## Related Project
 
@@ -60,7 +61,7 @@ Sample HEC-RAS input data and RAS2FIM-2D output data are provided separately fro
 
 The sample data are hosted in an Amazon S3 bucket:
 
-```text
+```
 s3://rasfim-2d-sample
 ```
 
@@ -70,37 +71,132 @@ The sample dataset includes representative HEC-RAS 2D input files and RAS2FIM-2D
 
 ---
 
-# Docker
+# Installation (Getting Ready to Run)
+
+The RAS2FIM-2D stack runs across two environments on a single Windows workstation:
+
+- **Linux Docker containers** — run the Python processing steps (`civileng127/ras2fim2d:v01`) and the parallel HEC-RAS compute workers (`civileng127/ras_v65:v01`).
+- **Windows + conda (miniforge)** — used for the local Python environment and for launching the parallel HEC-RAS worker batch job.
+
+Complete all four setup steps before running the pipeline.
+
+### 1. Install HEC-RAS v6.6 (local Windows machine)
+
+Install HEC-RAS **v6.6** to the local Windows machine. (The containerized compute workers use the HEC-RAS **v6.5** Docker image described below — this local install and the container image are separate.)
+
+### 2. Install `nccopy` (local Windows machine)
+
+Install `nccopy` (from the Unidata netCDF utilities) on the local Windows machine and ensure it is available on the system `PATH`.
+
+### 3. Pull the Docker images
+
+```
+docker pull civileng127/ras_v65:v01
+docker pull civileng127/ras2fim2d:v01
+```
+
+- `civileng127/ras_v65:v01` — HEC-RAS 6.5 Linux runtime used by the parallel compute workers. See **[Docker Hub — HEC-RAS Linux v6.5](https://hub.docker.com/r/civileng127/ras_v65)**.
+- `civileng127/ras2fim2d:v01` — RAS2FIM-2D Python processing environment.
+
+### 4. Clone the repository and build the conda environment (Windows)
+
+The example below uses **miniforge**. Adjust the working directory to suit your machine.
+
+```
+cd C:\Users\civil\dev
+git clone https://github.com/andycarter-pe/ras2fim-2d.git
+cd ras2fim-2d
+conda env create -f environment_ras2fim2d.yml
+```
+
+---
+
+# How to Run the Stack
+
+The pipeline is executed in three phases. Steps `0`–`8` are selected with the `-s "(start,end)"` argument, so each phase runs a contiguous range of steps.
+
+> **Substitute your own paths.** The commands below use example input/output locations:
+> - Model input: `D:\to_aws_20260908\HEC-RAS`
+> - Model output: `E:\mac_test_output_20260909`
+>
+> Replace these with the paths to your HEC-RAS model directory and your desired output directory.
+
+### Argument reference
+
+| Argument | Meaning |
+|----------|---------|
+| `-i` | Input directory (the base HEC-RAS 2D model). Mounted as `/model_input` in the container. |
+| `-o` | Output directory for RAS2FIM-2D products. Mounted as `/model_output` in the container. |
+| `-c` | Configuration file (`config_global.ini` in the Linux container; `config_global_windows.ini` for the Windows run). |
+| `-f` | Feature-selection tuple, e.g. `"(1,1,1)"`. |
+| `-s` | Step range to execute as `"(start,end)"`, e.g. `"(0,2)"`, `"(2,2)"`, `"(4,8)"`. |
+
+---
+
+## Phase 1 — Steps 0 to 2 (Linux Docker container)
+
+Runs the initial processing steps that prepare the model and set up the HEC-RAS runs.
+
+```
+docker run -it ^
+  -v D:\to_aws_20260908\HEC-RAS:/model_input ^
+  -v E:\mac_test_output_20260909:/model_output ^
+  civileng127/ras2fim2d:v01 ^
+  python ras2fim-2d.py -i /model_input -o /model_output -c config_global.ini -f "(1,1,1)" -s "(0,2)"
+```
+
+> The `^` characters are Windows line-continuation and are optional — the command can be entered on a single line.
+
+## Phase 2 — Run HEC-RAS 2D (Windows) to create the temp HDF files to send to Linux Docker
+
+Step 2 may instead be run directly in the Windows conda environment (uses `config_global_windows.ini` and local paths):
+
+```
+conda activate ras2fim2d
+python C:\Users\civil\dev\ras2fim-2d\src\ras2fim-2d.py -i D:\to_aws_20260908\HEC-RAS -o E:\mac_test_output_20260909 -c C:\Users\civil\dev\ras2fim-2d\src\config_global_windows.ini -f "(1,1,1)" -s "(2,2)"
+```
+
+---
+
+## Phase 3 — Step 3 (Windows batch: parallel HEC-RAS workers)
+
+Phase 1 generates a batch file in the output directory. Run it to launch the HEC-RAS compute jobs. This runs **four (4)** `civileng127/ras_v65:v01` HEC-RAS Docker workers concurrently.
+
+```
+E:\mac_test_output_20260909\02b_prep_for_ras\run_docker_windows_parallel.bat
+```
+
+> **Runtime:** approximately **five minutes** for the sample dataset.
+
+---
+
+## Phase 4 — Steps 4 to 8 (Linux Docker container)
+
+Post-processes the HEC-RAS results into the final flood inundation mapping (FIM) library.
+
+```
+docker run -it ^
+  -v D:\to_aws_20260908\HEC-RAS:/model_input ^
+  -v E:\mac_test_output_20260909:/model_output ^
+  civileng127/ras2fim2d:v01 ^
+  python ras2fim-2d.py -i /model_input -o /model_output -c config_global.ini -f "(1,1,1)" -s "(4,8)"
+```
+
+---
+
+# Docker (Reference)
 
 RAS2FIM-2D uses Docker to provide a reproducible processing environment. The workflow also requires a containerized installation of **HEC-RAS 6.5**.
 
-## HEC-RAS 6.5 Docker Image
+## Build the RAS2FIM-2D image (optional, for developers)
 
-A pre-built HEC-RAS 6.5 Docker image is available on Docker Hub:
-**[Docker Hub HEC-RAS Linux v6.5](https://hub.docker.com/r/civileng127/ras_v65)**
+A `Dockerfile` is included in this repository. Instead of pulling the pre-built `civileng127/ras2fim2d:v01` image, you can build it locally:
 
-Pull the image with:
-
-```bash
-docker pull civileng127/ras_v65:v0
 ```
-This container provides the HEC-RAS 6.5 runtime to execute the 2D unsteady simulations in a Linux environment.
-
-## Build the RAS2FIM-2D Image
-
-A Dockerfile is included in this repository for building the RAS2FIM-2D processing environment.
-
-Clone the repository and build the image:
-
-```bash
 docker build -t ras2fim2d .
 ```
 
-## Run RAS2FIM-2D
-
-After building the image, mount the directory containing the HEC-RAS model and output data into the container and run the RAS2FIM-2D workflow.
-
-Refer to the example configuration and scripts in this repository for the required command-line arguments.
+---
 
 # Output
 
