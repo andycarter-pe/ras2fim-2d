@@ -103,7 +103,6 @@ def fn_copy_ras_hdf_plans(str_model_path_02, str_hdf_path_03):
 
 # ++++++++++++++++++++++++
 def fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03):
-    str_hdf_path_03.mkdir(parents=True, exist_ok=True)
     copied = 0
     for src in sorted(str_model_path_02b.rglob("*.p01.tmp.hdf")):
         # strip the ".tmp" so "<name>.p01.tmp.hdf" -> "<name>.p01.hdf"
