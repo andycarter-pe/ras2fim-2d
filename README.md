@@ -11,7 +11,7 @@ multiple water surface elevations (WSEL) indexed to multiple flow rates in cfs. 
 These scripts were developed in support of the National Weather Service (Research Project NA22NWS4320003 / A25-0366-S018).
 
 <p align="center">
-  <img src="/doc/lisflood2fim.gif" alt="sample cross section" width="55%">
+  <img src="/doc/ras2fim_animation.gif" alt="sample cross section" width="55%">
 </p>
 
   - **Technology stack**: Scripts were all developed in Python 3.8.12<br>
