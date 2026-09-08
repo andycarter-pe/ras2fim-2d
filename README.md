@@ -1,49 +1,108 @@
-# RAS2FIM-2D <img src="doc/Logo_CWE.png" align="right" alt="ras2fim2d agency" height="80"> <br> <br>
-## <i>RAS2FIM-2D - Flood Inundation Mapping (FIM) using HEC-RAS 2D</i>
+# RAS2FIM-2D <img src="doc/Logo_CWE.png" align="right" alt="Center for Water and the Environment" height="80">
+
+<br clear="right">
+
+## *Flood Inundation Mapping using HEC-RAS 2D*
 
 <img src="/doc/ras2fim2d-logo-20260907.png" align="right"
-     alt="ras2fim2d logo" width="160" height="160">
+     alt="RAS2FIM-2D logo" width="160" height="160">
 
-**Description**:  RAS2FIM-2D convert 2D HEC-RAS models into a set of flood inundation mapping (fim) library of rasters (netCDF) for a corresponding National Water Model (NWM) NextGEN stream segments within the HEC-RAS model's 2D area.<br><br>
-Simulations are run to a points of stability using a "firehose" method where a series of constant flows is set on an internal boundary condition ("Emitter1") <br><br>
-Flows are emmitted at the upsteram ends of the NextGEN hydrofabric catchments and clipped to flooding around a given NextGEN id (Example: wb-2427467).  The ultimate output is a netCDF of 
-multiple water surface elevations (WSEL) indexed to multiple flow rates in cfs.  The netCDF file also contains the source terrain on which the WSEL were determined.<br><br>
-These scripts were developed in support of the National Weather Service (Research Project NA22NWS4320003 / A25-0366-S018).
+**RAS2FIM-2D** converts 2D HEC-RAS models into flood inundation mapping (FIM) libraries for National Water Model (NWM) NextGen stream segments represented within the HEC-RAS model's 2D computational area.
+
+The workflow uses a "firehose" approach in which a series of constant-flow simulations is performed by applying flow to an internal HEC-RAS boundary condition named `Emitter1`. Flows are introduced near the upstream ends of the NWM NextGen hydrofabric catchments and the resulting inundation is clipped to the area associated with the corresponding NextGen `feature_id` (for example, `wb-2427467`).
+
+The resulting FIM library contains water-surface elevations (WSEL) indexed by flow rate (cfs). The output NetCDF files also contain the terrain used by HEC-RAS to compute the water-surface elevations.
+
+This project was developed in support of the National Weather Service under **Research Project NA22NWS4320003 / A25-0366-S018**.
 
 <p align="center">
-  <img src="/doc/ras2fim_animation.gif" alt="sample cross section" width="85%">
+  <img src="/doc/ras2fim_animation.gif" alt="RAS2FIM-2D example" width="85%">
 </p>
 
-  - **Technology stack**: Scripts were all developed in Python 3.8.12<br>
-  - **Status**:  Version 0.1- Preliminary release. (2026.09.07)<br>
-  - **Related Projects**: Flood Inundation Maps from HEC-RAS 1D models  https://github.com/NOAA-OWP/ras2fim<br>
-  
-## HEC-RAS 2D Requirements
-  - **Internal BC**: An internal boundary condition named "Emitter1" must be present in the 2D area<br>
-  - **Flow Hydrograph**:  Flow hydrogrph for "Emitter1" must be set to 'Use Simulation Time'<br>
-  - **Computation Interval**:  Spawned runs inherit computation interval from base HEC-RAS unsteady plan<br>
-  - **Projection File**:  The projection file should be a folder where the base HEC-RAS exists<br>
-  - **Terrain File**:  The terrain file should be a folder where the base HEC-RAS exists<br>
-  
-Note that a sample HEC-RAS input file is provided in this repository.
- 
+## Status
+
+**Version:** 0.1 — Preliminary release  
+**Release date:** 2026-09-07
+
+## Technology
+
+- Python 3.8.12
+- HEC-RAS 2D
+- Docker
+- NetCDF
+- GDAL / raster processing libraries
+
+## Related Project
+
+[NOAA-OWP/ras2fim](https://github.com/NOAA-OWP/ras2fim) — Flood Inundation Maps generated from HEC-RAS 1D models.
+
+---
+
+# HEC-RAS 2D Requirements
+
+The base HEC-RAS model must meet the following requirements:
+
+- **Internal Boundary Condition:** An internal boundary condition named `Emitter1` must be present within the 2D flow area.
+- **Flow Hydrograph:** The flow hydrograph for `Emitter1` must be configured to **Use Simulation Time**.
+- **Computation Interval:** Spawned simulations inherit the computation interval from the base HEC-RAS unsteady plan.
+- **Projection:** The HEC-RAS projection file must be located in the same directory as the base HEC-RAS model.
+- **Terrain:** The terrain file used by the HEC-RAS model must be accessible from the base HEC-RAS model directory.
+
+---
+
+# Sample Data
+
+Sample HEC-RAS input data and RAS2FIM-2D output data are provided separately from the source repository.
+
+### Browse the sample data
+
+**[RAS2FIM-2D Sample Data](https://rasfim-2d-sample.s3.amazonaws.com/index.html)**
+
+The sample data are hosted in an Amazon S3 bucket:
+
+```text
+s3://rasfim-2d-sample
 ```
-docker build -t ras2fim2d .
-  
-## Dockerfile
-To build a container from this repository, clone to your local drive and build with the following command
-```
+
+The sample dataset includes representative HEC-RAS 2D input files and RAS2FIM-2D output files that can be used to test the workflow and examine the resulting FIM products.
+
+> **Note:** The sample data are intentionally hosted separately from the GitHub repository because HEC-RAS model inputs and FIM outputs can be relatively large.
+
+---
+
+# Docker
+
+A Dockerfile is included in this repository for building the RAS2FIM-2D processing environment.
+
+## Build the Docker image
+
+Clone the repository and build the image:
+
+```bash
 docker build -t ras2fim2d .
 ```
 
-## Docker Container
-For convience, a container has been pre-built and pushed to DockerHub.  To pull this container to your machine...
-```
-docker pull civileng127/lisflood2fim:20260611
-```
-Run the containers demo: Note '/mnt/e/lisflood_dump' is the local directory where output will be saved
-```
-docker run -it \
--v /mnt/e/lisflood_dump:/mnt \
-civileng127/lisflood2fim:20260611 \
-bash -c "
+## Run RAS2FIM-2D
+
+After building the image, mount the directory containing the HEC-RAS model and output data into the container and run the RAS2FIM-2D workflow.
+
+Refer to the example configuration and scripts in this repository for the required command-line arguments.
+
+# Output
+
+RAS2FIM-2D produces flood inundation mapping libraries containing water-surface elevations associated with multiple flow rates.
+
+The primary output is a NetCDF file containing:
+
+- Water-surface elevation (WSEL)
+- Flow rate associated with each WSEL
+- Terrain data used by the HEC-RAS simulation
+- Spatial information required to interpret the results
+
+The output can be used as a library for rapidly retrieving flood inundation information for NWM NextGen stream segments.
+
+---
+
+# License
+
+See the repository license for terms of use.
