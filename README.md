@@ -72,9 +72,27 @@ The sample dataset includes representative HEC-RAS 2D input files and RAS2FIM-2D
 
 # Docker
 
-A Dockerfile is included in this repository for building the RAS2FIM-2D processing environment.
+RAS2FIM-2D uses Docker to provide a reproducible processing environment. The workflow also requires a containerized installation of **HEC-RAS 6.5**.
 
-## Build the Docker image
+## HEC-RAS 6.5 Docker Image
+
+A pre-built HEC-RAS 6.5 Docker image is available on Docker Hub:
+
+```text
+civileng127/ras_v65
+```
+
+Pull the image with:
+
+```bash
+docker pull civileng127/ras_v65
+```
+
+This container provides the HEC-RAS 6.5 runtime used by RAS2FIM-2D to execute the 2D unsteady simulations.
+
+## Build the RAS2FIM-2D Image
+
+A Dockerfile is included in this repository for building the RAS2FIM-2D processing environment.
 
 Clone the repository and build the image:
 
