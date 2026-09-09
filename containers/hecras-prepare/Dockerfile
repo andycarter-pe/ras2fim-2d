@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1.7
+ARG PYTHON_IMAGE=python:3.13.15-slim-trixie@sha256:cc9dffa47c8294ba9bb795a8dfaeb7b76f2b30acade2c52a461a2999d127eb00
+FROM ${PYTHON_IMAGE}
+
+ARG RAS_COMMANDER_COMMIT
+ARG RAS_COMMANDER_WHEEL_SHA256
+ARG HEC_RAS_VERSION=6.5
+ARG WINE_VERSION=11.0.0.0~trixie-1
+ARG XVFB_VERSION=2:21.1.16-1.3+deb13u3
+ARG XAUTH_VERSION=1:1.1.2-1.1
+ARG PROCPS_VERSION=2:4.0.4-9
+ARG TINI_VERSION=0.19.0-3+b7
+
+RUN dpkg --add-architecture i386 \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates=20250419 \
+        gnupg=2.4.7-21+deb13u1 \
+        wget=1.25.0-2 \
+    && mkdir -p /etc/apt/keyrings \
+    && wget -qO /etc/apt/keyrings/winehq-archive.key \
+        https://dl.winehq.org/wine-builds/winehq.key \
+    && wget -qO /etc/apt/sources.list.d/winehq-trixie.sources \
+        https://dl.winehq.org/wine-builds/debian/dists/trixie/winehq-trixie.sources \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        "winehq-stable=${WINE_VERSION}" \
+        "xvfb=${XVFB_VERSION}" \
+        "xauth=${XAUTH_VERSION}" \
+        "procps=${PROCPS_VERSION}" \
+        "tini=${TINI_VERSION}" \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/hecras-prepare
+RUN test -n "${RAS_COMMANDER_COMMIT}" \
+    && test "${#RAS_COMMANDER_COMMIT}" -eq 40 \
+    && test -n "${RAS_COMMANDER_WHEEL_SHA256}" \
+    && test "${#RAS_COMMANDER_WHEEL_SHA256}" -eq 64
+COPY containers/hecras-prepare/prepare.py ./prepare.py
+COPY containers/hecras-prepare/windows_worker.py ./windows_worker.py
+
+RUN useradd --create-home --uid 1000 rasworker \
+    && mkdir -p /job /runtime/wine-seed /run/ras-job \
+    && chown -R rasworker:rasworker /job /run/ras-job
+
+ENV RAS2FIM_JOB_ROOT=/job \
+    RAS2FIM_RUNTIME_MANIFEST=/runtime/wine-seed/runtime.json \
+    RAS2FIM_SCRATCH_ROOT=/run/ras-job \
+    RAS2FIM_HECRAS_VERSION=${HEC_RAS_VERSION} \
+    RAS2FIM_RAS_COMMANDER_COMMIT=${RAS_COMMANDER_COMMIT} \
+    RAS2FIM_RAS_COMMANDER_WHEEL_SHA256=${RAS_COMMANDER_WHEEL_SHA256} \
+    WINEDEBUG=-all
+
+LABEL org.opencontainers.image.title="ras2fim-2d HEC-RAS Wine preparation" \
+      io.clb.hec-ras.version="${HEC_RAS_VERSION}" \
+      io.clb.ras-commander.commit="${RAS_COMMANDER_COMMIT}" \
+      io.clb.ras-commander.wheel-sha256="${RAS_COMMANDER_WHEEL_SHA256}"
+
+USER rasworker
+ENTRYPOINT ["/usr/bin/tini", "--", "python", "/opt/hecras-prepare/prepare.py"]
+CMD ["prepare", "--help"]
