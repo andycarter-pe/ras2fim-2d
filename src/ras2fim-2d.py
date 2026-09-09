@@ -112,11 +112,12 @@ def fn_copy_results_from_02b_to_03(str_model_path_02b, str_hdf_path_03):
         # strip the ".tmp" so "<name>.p01.tmp.hdf" -> "<name>.p01.hdf"
         new_name = src.name.replace(".p01.tmp.hdf", ".p01.hdf")
         dst = path_hdf_03 / new_name
-        if dst.exists():
-            continue
-        shutil.copy2(src, dst)   # copy2 preserves timestamps
+
+        # Always overwrite an existing matching file
+        shutil.copy2(src, dst)
         copied += 1
-    print(f"Done. Copied {copied} file(s) to {path_hdf_03}")
+
+    print(f"  -- Copying HDF: Copied/overwritten {copied} file(s) to {path_hdf_03}")
 # ++++++++++++++++++++++++
 
 
@@ -259,9 +260,7 @@ def fn_ras2fim_2d(str_source_folder,
     # Make the subfolders for processing
     os.makedirs(str_hdf_path_03, exist_ok=True)
     
-    # Copy all the results "p01.hdf" from HEC-RAS to a new folder
-    fn_copy_ras_hdf_plans(str_model_path_02, str_hdf_path_03)
-    
+ 
     # ---- Preperation for steps 04, 05 and 06
     
     str_output_step_04 = os.path.join(str_output_dir,'04_wsel_and_hr')
@@ -293,10 +292,11 @@ def fn_ras2fim_2d(str_source_folder,
     # Prepare arguments for multiprocessing
     args = [(str_config_file_path, hdf_filepath, str_model_hydrofabric_path_01, str_output_step_04, b_print_output) for hdf_filepath in list_hdf_filepath]
     
-    fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03)
-    
     # === Step 04
     if int_start_step <= 4 and int_end_step >= 4:
+        # Copy all the results "p01.hdf" from HEC-RAS to a new folder -- always overwrite
+        fn_copy_results_from_02b_to_03(str_model_path_02b,str_hdf_path_03)
+        
         # Use multiprocessing with tqdm
         with mp.Pool(processes=num_processors) as pool:
             list(
