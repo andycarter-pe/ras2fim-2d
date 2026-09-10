@@ -21,6 +21,13 @@ and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
 referenced TIFF files.
 
+For a model on a Windows drive, run with `--user root`. CLB-08 testing found
+that HEC-RAS can display a hidden `Run-time error '75': Path/File access error`
+under UID 1000 on a writable Windows/WSL drive mount. The same model passed as
+root on that mount, and as UID 1000 on WSL's Linux filesystem. Missing terrain
+mounts and incorrect line endings are checked separately. Use a disposable
+model folder: a failure after HEC-RAS starts can leave partial output files.
+
 Before HEC-RAS starts, [model_checks.py][build-checks] reads the selected plan, geometry and
 unsteady flow inputs, checks the existing 2D geometry HDF, and verifies the
 projection, terrain HDF and referenced raster files. Missing dependencies fail
@@ -55,7 +62,26 @@ repository sample; it does not certify a complete hydraulic simulation.
 The 6.5 and 6.6 `latest` tags select their bundled releases. Normal jobs require
 no separate HEC-RAS installation or external runtime mount.
 
-## Run
+## Run on a Windows drive
+
+The following PowerShell command mounts the model and both dependency folders.
+Set `$models` to the parent folder containing all three and `$name` to the
+project filename without `.prj`. For HEC-RAS 6.6, use the matching 6.6 image.
+
+```powershell
+$models = 'E:\mac_test_output_Sept12\02_model_copies'
+$name = '1919912_wb-2427466_wb-2427467_14-hr_100-cfs_to_11609-cfs'
+docker pull rascommander/hec-ras-wine-precompute_6.5:v4
+docker run --rm --user root --mount "type=bind,src=$models\$name,dst=/job" --mount "type=bind,src=$models\source_terrain,dst=/source_terrain,readonly" --mount "type=bind,src=$models\projection,dst=/projection,readonly" rascommander/hec-ras-wine-precompute_6.5:v4 prepare --project "/job/$name.prj" --plan 01 --timeout 900 --replace-generated
+```
+
+CLB-08 was tested with Docker Engine inside Ubuntu WSL2 and files on Windows
+C:. From a WSL shell, use Linux source paths such as `/mnt/c/...`; from
+PowerShell, `wsl -d Ubuntu -- docker ...` also needs those WSL source paths.
+The Windows-path command above targets Docker Desktop; that engine was not
+available for our end-to-end test. See the [test record](RELEASE-VERIFICATION.md).
+
+## Run on a Linux filesystem
 
 ```bash
 docker pull rascommander/hec-ras-wine-precompute_6.5:v4
@@ -79,8 +105,8 @@ host folder after the container exits. Mount terrain/projection dependencies
 where the model expects them. Use a unique run ID. `--replace-generated` can
 remove an existing final plan HDF, so preserve wanted results elsewhere.
 
-The qualified host supplies `/dev/ntsync`; hosts without it require separate
-qualification. Read and agree to the [HEC-RAS terms](https://www.hec.usace.army.mil/confluence/rasdocs/rasum/6.6/terms-and-conditions-of-use)
+The Linux recipe uses `/dev/ntsync` when the host supplies it. CLB-08 WSL2
+testing uses the simpler root-user command without passing this device. Read and agree to the [HEC-RAS terms](https://www.hec.usace.army.mil/confluence/rasdocs/rasum/6.6/terms-and-conditions-of-use)
 before use. [init_ras_project()][init] uses `accept_tcu=True` with the prepared
 profile's saved acceptance state.
 

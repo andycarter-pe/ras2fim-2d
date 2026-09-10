@@ -20,7 +20,7 @@ def snapshot(folder):
             for p in folder.rglob("*") if p.is_file() and ".ras-commander" not in p.parts}
 
 
-def run_cases(image, source, work):
+def run_cases(image, source, work, container_user=None):
     source = Path(source).resolve(strict=True)
     work = Path(work).resolve()
     repo = Path(__file__).resolve().parents[2]
@@ -51,7 +51,9 @@ def run_cases(image, source, work):
                 path.write_bytes(data)
         before = snapshot(folder)
         cmd = ["docker", "run", "--rm"]
-        if case != "crlf":
+        if container_user is not None:
+            cmd += ["--user", container_user]
+        elif case != "crlf":
             cmd += ["--user", "root"]
         cmd += ["--mount", "type=bind,src=" + str(folder) + ",dst=/job"]
         if case != "missing-dependencies":
@@ -87,5 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("--image", required=True)
     parser.add_argument("--source-project", required=True)
     parser.add_argument("--work-dir", required=True)
+    parser.add_argument("--container-user", help="Docker user for every case; use root for Windows drive mounts")
     args = parser.parse_args()
-    raise SystemExit(0 if run_cases(args.image, args.source_project, args.work_dir) else 1)
+    raise SystemExit(0 if run_cases(args.image, args.source_project, args.work_dir,
+                                  args.container_user) else 1)
