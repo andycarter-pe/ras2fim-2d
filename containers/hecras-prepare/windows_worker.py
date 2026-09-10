@@ -62,9 +62,13 @@ def write_json(path, payload):
 def run_worker(project, plan, ras_executable, ras_commander_wheel,
                expected_ras_commander_wheel_sha256, timeout, replace_generated):
     """Prepare one plan with the public ras-commander preprocessing API."""
+    from model_checks import preflight, normalize_inputs, validate_outputs
+
     provenance = verify_ras_commander(
         Path(ras_commander_wheel), expected_ras_commander_wheel_sha256
     )
+    inputs, geometry_hdf, baseline, dependencies = preflight(project, plan)
+    normalized = normalize_inputs(inputs)
     from ras_commander import (
         GeomPreprocessor,
         RasPlan,
@@ -97,6 +101,9 @@ def run_worker(project, plan, ras_executable, ras_commander_wheel,
         clear_existing=replace_generated,
         fix_line_endings=True,
     )
+    if not result:
+        raise RuntimeError(result.error or "HEC-RAS preprocessing failed")
+    validation = validate_outputs(geometry_hdf, result.tmp_hdf_path, baseline)
     return {
         "success": bool(result),
         "plan": result.plan_number,
@@ -109,6 +116,12 @@ def run_worker(project, plan, ras_executable, ras_commander_wheel,
         "full_result_copied": result.full_result_copied,
         "timed_out": result.timed_out,
         "error": result.error,
+        "input_preparation": {
+            "line_endings": "CRLF",
+            "normalized_files": normalized,
+            "dependencies": dependencies,
+        },
+        "hdf_validation": validation,
         **provenance,
     }
 

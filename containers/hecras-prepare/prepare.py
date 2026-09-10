@@ -327,6 +327,10 @@ def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
             raise JobError("Wine preparation has no accepted early-stop signal")
         if result.get("ras_commander_wheel_sha256") != runtime["wheel_sha"]:
             raise JobError("Wine worker imported a different ras-commander wheel")
+        validation = result.get("hdf_validation")
+        if not isinstance(validation, dict) or not all(
+                validation.get(key) for key in ("geometry", "temporary_plan")):
+            raise JobError("Wine worker did not validate the 2D geometry and hydraulic tables")
 
         paths = []
         for key, expected in zip(("tmp_hdf_path", "b_file_path", "x_file_path"), outputs):
@@ -350,6 +354,8 @@ def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
                 "worker_elapsed_seconds": result.get("elapsed_seconds"),
                 "ras_commander_wheel_sha256": result.get("ras_commander_wheel_sha256"),
                 "ras_commander_distribution_version": result.get("ras_commander_distribution_version"),
+                "input_preparation": result.get("input_preparation"),
+                "hdf_validation": validation,
             },
         }
         write_json(receipt_path, receipt)
@@ -402,7 +408,7 @@ def main(argv=None):
             args.run_id,
             Path(os.environ.get("RAS2FIM_JOB_ROOT", "/job")),
             Path(os.environ.get("RAS2FIM_RUNTIME_MANIFEST", "/runtime/wine-seed/runtime.json")),
-            os.environ.get("RAS2FIM_HECRAS_VERSION", "6.5"),
+            os.environ.get("RAS2FIM_HECRAS_VERSION", "6.6"),
         )
     except (JobError, OSError, ValueError) as exc:
         print("hecras-prepare: " + str(exc), file=sys.stderr)

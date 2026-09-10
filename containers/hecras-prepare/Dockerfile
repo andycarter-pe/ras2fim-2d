@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.7
 ARG PYTHON_IMAGE=python:3.13.15-slim-trixie@sha256:cc9dffa47c8294ba9bb795a8dfaeb7b76f2b30acade2c52a461a2999d127eb00
-FROM ${PYTHON_IMAGE}
+FROM ${PYTHON_IMAGE} AS base
 
 ARG RAS_COMMANDER_COMMIT
 ARG RAS_COMMANDER_WHEEL_SHA256
-ARG HEC_RAS_VERSION=6.5
+ARG HEC_RAS_VERSION=6.6
 ARG WINE_VERSION=11.0.0.0~trixie-1
 ARG XVFB_VERSION=2:21.1.16-1.3+deb13u3
 ARG XAUTH_VERSION=1:1.1.2-1.1
@@ -38,6 +38,7 @@ RUN test -n "${RAS_COMMANDER_COMMIT}" \
     && test "${#RAS_COMMANDER_WHEEL_SHA256}" -eq 64
 COPY containers/hecras-prepare/prepare.py ./prepare.py
 COPY containers/hecras-prepare/windows_worker.py ./windows_worker.py
+COPY containers/hecras-prepare/model_checks.py ./model_checks.py
 
 RUN useradd --create-home --uid 1000 rasworker \
     && mkdir -p /job /runtime/wine-seed /run/ras-job \
@@ -59,3 +60,18 @@ LABEL org.opencontainers.image.title="ras2fim-2d HEC-RAS Wine preparation" \
 USER rasworker
 ENTRYPOINT ["/usr/bin/tini", "--", "python", "/opt/hecras-prepare/prepare.py"]
 CMD ["prepare", "--help"]
+
+# Release builds provide a prepared profile as an external named build context.
+# --target base remains available for development with a mounted runtime.
+FROM base AS bundled
+USER root
+# Copy and normalize ownership in one layer to avoid duplicating the runtime.
+RUN --mount=type=bind,from=hecras_runtime,target=/seed,readonly \
+    cp -a /seed/runtime.json /seed/prefix /runtime/wine-seed/ \
+    && chown -R root:root /runtime/wine-seed \
+    && find /runtime/wine-seed -type d -exec chmod 755 {} + \
+    && find /runtime/wine-seed -type f -exec chmod u+rw,go+r,go-w {} + \
+    && python -c "import os; from prepare import load_runtime; load_runtime(os.environ['RAS2FIM_RUNTIME_MANIFEST'], os.environ['RAS2FIM_HECRAS_VERSION'])"
+ENV RAS2FIM_BUNDLED_RUNTIME=1
+LABEL io.clb.hec-ras.runtime="bundled"
+USER rasworker

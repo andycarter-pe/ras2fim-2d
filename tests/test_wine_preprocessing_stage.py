@@ -14,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 import stage_hecras_for_linux_wine_02b as stage
 
-PREPARE_IMAGE = "rascommander/hec-ras-wine-precompute_6.5@sha256:" + "a" * 64
+PREPARE_IMAGE = "rascommander/hec-ras-wine-precompute_6.6@sha256:" + "a" * 64
 
 
 def load_container_script(name):
@@ -32,8 +32,8 @@ def write_config(path, shared_root):
         "str_windows_share": str(shared_root),
         "str_linux_share": "/shared",
         "str_prepare_image": PREPARE_IMAGE,
-        "str_prepare_version": "6.5",
-        "str_wine_profile": "/runtime/hecras-6.5",
+        "str_prepare_version": "6.6",
+        "str_wine_profile": "/runtime/hecras-6.6",
         "int_prepare_cores_per_job": "2",
         "int_prepare_memory_gb": "6",
         "b_use_ntsync": "false",
@@ -81,7 +81,7 @@ def write_receipt(project, run_id):
         "project": project.name,
         "plan": "01",
         "geometry": "01",
-        "runtime": {"kind": "wine", "hec_ras_version": "6.5"},
+        "runtime": {"kind": "wine", "hec_ras_version": "6.6"},
         "result": {
             "timed_out": False,
             "full_result_copied": False,
@@ -166,6 +166,11 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
     import types
 
     worker = load_container_script("windows_worker")
+    checks = types.ModuleType("model_checks")
+    checks.preflight = lambda *args: ([], tmp_path / "Model.g01.hdf", {}, [])
+    checks.normalize_inputs = lambda paths: []
+    checks.validate_outputs = lambda *args: {"geometry": {"area": {}}, "temporary_plan": {"area": {}}}
+    monkeypatch.setitem(sys.modules, "model_checks", checks)
     calls = {}
     plan_path = tmp_path / "Model.p01"
 
@@ -230,7 +235,7 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
     result = worker.run_worker(
         str(tmp_path / "Model.prj"),
         "01",
-        "C:/HEC-RAS/6.5/Ras.exe",
+        "C:/HEC-RAS/6.6/Ras.exe",
         "C:/runtime/ras_commander.whl",
         "d" * 64,
         300,
@@ -243,3 +248,42 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
     assert calls["flags"] == {"geometry_preprocessor": True}
     assert calls["prepare"][1]["max_wait"] == 300
     assert calls["prepare"][1]["clear_existing"] is True
+
+
+@pytest.mark.parametrize("profile", [None, "", "/controlled/wine-6.6"])
+def test_runtime_mount_is_optional_for_bundled_images(generated_models, profile):
+    config_path, _, _, projects = generated_models
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(config_path)
+    section = config["03_run_hec_ras"]
+    if profile is None:
+        section.pop("str_wine_profile")
+    else:
+        section["str_wine_profile"] = profile
+    with config_path.open("w", encoding="utf-8") as stream:
+        config.write(stream)
+    settings = stage._load_settings(config_path)
+    command = stage._container_command(settings, projects[0], 300, "bundled-test")
+    mounts = [command[index + 1] for index, item in enumerate(command) if item == "--mount"]
+    runtime_mounts = [mount for mount in mounts if "dst=/runtime/wine-seed" in mount]
+    assert runtime_mounts == (["type=bind,src=" + profile + ",dst=/runtime/wine-seed,readonly"] if profile else [])
+    assert "--read-only" in command
+
+
+@pytest.mark.parametrize("relative,excluded", [
+    ("prefix/drive_c/Program Files (x86)/HEC/HEC-RAS/6.5/Ras.exe", False),
+    ("prefix/drive_c/Program Files (x86)/HEC/HEC-RAS/7.0.1/Ras.exe", True),
+    ("prefix/drive_c/users/rasworker/AppData/Local/Temp/setup.exe", True),
+    ("prefix/drive_c/users/rasworker/Documents/model.prj", True),
+    ("prefix/drive_c/users/rasworker/AppData/Local/HEC/settings.xml", False),
+    ("prefix/drive_c/users/rasworker/AppData/Local/pip/cache/download", True),
+    ("prefix/drive_c/windows/system32/kernel32.dll", False),
+    ("prefix/user.reg", False),
+    ("prefix/drive_c/a0da2ed8e5bc9f2258/Setup.exe", True),
+    ("prefix/drive_c/ProgramData/HEC/Installation Cache/setup.msi", True),
+    ("prefix/drive_c/Python311/Lib/site-packages/pyogrio/tests/fixtures/test.prj", False),
+])
+def test_release_profile_keeps_runtime_and_excludes_private_or_temporary_files(monkeypatch, relative, excluded):
+    monkeypatch.syspath_prepend(str(REPO_ROOT / "containers" / "hecras-prepare"))
+    bundle = load_container_script("bundle_profile")
+    assert bundle.excluded_path(relative, "6.5") is excluded
