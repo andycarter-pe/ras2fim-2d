@@ -17,12 +17,12 @@ remaining work needed for that fully independent reconstruction.
 ### 1. Gather the build inputs
 
 Use the [GitHub source snapshot][build-inputs] containing these files under
-`containers/hecras-prepare/`. The source links require access to the private CLB
-repository. External inputs link to their example or layout documentation.
+`containers/hecras-prepare/`. The source links point to the public PR branch. External inputs link to their example or layout documentation.
 
 | Input | Purpose |
 |---|---|
 | [Dockerfile][build-dockerfile] | Linux tools, user 1000, bundled Wine profile, and entrypoint. |
+| [model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py) | Checks dependencies, normalizes input line endings and validates HDF content. |
 | [prepare.py][build-controller] | Linux job controller, private runtime setup, worker launch, and receipts. |
 | [windows_worker.py][build-worker] | Calls the linked [ras-commander][rc] APIs under Wine. |
 | [bundle_profile.py][build-exporter] | Exports a prepared runtime into the external build context. |
