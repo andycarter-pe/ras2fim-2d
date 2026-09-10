@@ -22,12 +22,13 @@ and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
 referenced TIFF files.
 
-For a model on a Windows drive, run with `--user root`. CLB-08 testing found
-that HEC-RAS can display a hidden `Run-time error '75': Path/File access error`
-under UID 1000 on a writable Windows/WSL drive mount. The same model passed as
-root on that mount, and as UID 1000 on WSL's Linux filesystem. Missing terrain
-mounts and incorrect line endings are checked separately. Use a disposable
-model folder: a failure after HEC-RAS starts can leave partial output files.
+Use `--user root` for a command that works with both Docker Desktop and
+Ubuntu WSL Windows-drive mounts. Docker Desktop 4.90 also passed the default
+UID-1000 CRLF checks for HEC-RAS 6.5 and 6.6. Ubuntu's direct `/mnt/c` mount
+produced a hidden HEC-RAS `Run-time error '75': Path/File access error` under
+UID 1000; root passed there. Use a disposable model folder, since a failure
+after HEC-RAS starts can leave partial outputs. See the
+[host qualification results](RELEASE-VERIFICATION.md).
 
 Before HEC-RAS starts, [model_checks.py][build-checks] reads the selected plan, geometry and
 unsteady flow inputs, checks the existing 2D geometry HDF, and verifies the

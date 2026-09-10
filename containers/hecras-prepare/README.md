@@ -21,12 +21,13 @@ and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
 referenced TIFF files.
 
-For a model on a Windows drive, run with `--user root`. CLB-08 testing found
-that HEC-RAS can display a hidden `Run-time error '75': Path/File access error`
-under UID 1000 on a writable Windows/WSL drive mount. The same model passed as
-root on that mount, and as UID 1000 on WSL's Linux filesystem. Missing terrain
-mounts and incorrect line endings are checked separately. Use a disposable
-model folder: a failure after HEC-RAS starts can leave partial output files.
+Use `--user root` for a command that works with both Docker Desktop and
+Ubuntu WSL Windows-drive mounts. Docker Desktop 4.90 also passed the default
+UID-1000 CRLF checks for HEC-RAS 6.5 and 6.6. Ubuntu's direct `/mnt/c` mount
+produced a hidden HEC-RAS `Run-time error '75': Path/File access error` under
+UID 1000; root passed there. Use a disposable model folder, since a failure
+after HEC-RAS starts can leave partial outputs. See the
+[host qualification results](RELEASE-VERIFICATION.md).
 
 Before HEC-RAS starts, [model_checks.py][build-checks] reads the selected plan, geometry and
 unsteady flow inputs, checks the existing 2D geometry HDF, and verifies the
@@ -75,11 +76,11 @@ docker pull rascommander/hec-ras-wine-precompute_6.5:v4
 docker run --rm --user root --mount "type=bind,src=$models\$name,dst=/job" --mount "type=bind,src=$models\source_terrain,dst=/source_terrain,readonly" --mount "type=bind,src=$models\projection,dst=/projection,readonly" rascommander/hec-ras-wine-precompute_6.5:v4 prepare --project "/job/$name.prj" --plan 01 --timeout 900 --replace-generated
 ```
 
-CLB-08 was tested with Docker Engine inside Ubuntu WSL2 and files on Windows
-C:. From a WSL shell, use Linux source paths such as `/mnt/c/...`; from
-PowerShell, `wsl -d Ubuntu -- docker ...` also needs those WSL source paths.
-The Windows-path command above targets Docker Desktop; that engine was not
-available for our end-to-end test. See the [test record](RELEASE-VERIFICATION.md).
+The native Windows Docker CLI and these mounts were qualified with Docker
+Desktop 4.90 on CLB-08 for HEC-RAS 6.5 and 6.6. The PowerShell command also
+passed with spaces in the host folder path. From a WSL shell, use Linux source
+paths such as `/mnt/c/...`; `wsl -d Ubuntu -- docker ...` from PowerShell also
+needs those WSL paths. See the [test record](RELEASE-VERIFICATION.md).
 
 ## Run on a Linux filesystem
 

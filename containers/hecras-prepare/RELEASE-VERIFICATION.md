@@ -27,7 +27,7 @@ The fixture was the retained repository 50-cfs sample, copied separately for
 every run. This validates preprocessing, not a full hydraulic simulation or
 Andy's exact 100-cfs model.
 
-## Windows drive qualification on CLB-08
+## Ubuntu WSL Windows-drive qualification on CLB-08
 
 Eight additional cases passed against the published 6.5 and 6.6 image digests:
 LF, CRLF, mixed inputs and missing dependencies for each version, all using
@@ -35,7 +35,8 @@ LF, CRLF, mixed inputs and missing dependencies for each version, all using
 `/mnt/c/Users/bill/ras2fim-reliability-20260910`. Docker Engine 29.1.3 ran inside
 Ubuntu 26.04 LTS on WSL2, kernel `6.6.87.2-microsoft-standard-WSL2`, on Windows
 11 Pro build 26200. Docker Engine was installed in the existing WSL distribution
-for this test. Docker Desktop was not installed on CLB-08.
+for this test. Its Ubuntu engine is separate from the Docker Desktop engine
+qualified below.
 
 | Runtime | LF temporary HDF | CRLF temporary HDF | Mixed temporary HDF | Missing mounts |
 |---|---:|---:|---:|---|
@@ -59,11 +60,10 @@ the evidence and are not counted as passes.
 Use `--user root` for Windows drive mounts. UID 1000 remains qualified for
 writable Linux model folders. A failure after HEC-RAS starts can leave partial
 model outputs, so use disposable copies and require a successful, validated
-receipt before staging computation. Windows Docker Desktop itself remains
-unverified; WSL2 Docker with Windows-hosted data is the tested configuration.
-HEC-RAS 7.0.1 has not been qualified on this Windows host.
+receipt before staging computation. Docker Desktop's default-user results are
+recorded separately below. HEC-RAS 7.0.1 has not been qualified on this Windows host.
 
-### Repeat the Windows-drive cases
+### Repeat the Ubuntu WSL cases
 
 From WSL, run the checked-in runner with a fresh external work directory and a
 source project whose parent has sibling `source_terrain` and `projection` folders:
@@ -83,6 +83,60 @@ case's outcome. Full evidence, including the initial failures and dialog
 capture, remains outside Git under
 `C:\Users\bill\ras2fim-reliability-20260910` on CLB-08.
 
+
+## Docker Desktop qualification on CLB-08
+
+Eleven checks passed on Docker Desktop 4.90.0 (build 238679), Engine 29.7.2,
+with its WSL2 backend on Windows 11 Pro build 26200. The native Windows
+`docker.exe` used the `desktop-linux` context and
+`npipe:////./pipe/dockerDesktopLinuxEngine`. The engine identified itself as
+`Docker Desktop`, host `docker-desktop`. All model bind mounts used native
+`C:\Users\bill\...` source paths; Ubuntu integration was disabled.
+
+For each of HEC-RAS 6.5 and 6.6, the four-case suite passed with `--user root`:
+LF, CRLF, mixed line endings and missing terrain/projection mounts. A separate
+CRLF run also passed as the image's default UID 1000 for each runtime.
+The documented PowerShell mount syntax passed an additional 6.5 run with
+spaces in the Windows host folder path.
+
+| Runtime | LF temporary HDF | CRLF temporary HDF | Mixed temporary HDF | Default UID 1000, CRLF | Missing mounts |
+|---|---:|---:|---:|---:|---|
+| 6.5 | 2,680,668 bytes | 2,681,002 bytes | 2,680,668 bytes | 2,681,002 bytes | Rejected without model changes |
+| 6.6 | 2,681,108 bytes | 2,681,108 bytes | 2,681,108 bytes | 2,681,108 bytes | Rejected without model changes |
+
+Independent inspection of all eighteen HDF files from the nine successful
+preprocessing runs confirmed all 6,548 cells and populated cell-volume and
+face-area elevation tables in both geometry and temporary-plan HDFs. The two
+missing-dependency cases returned failed receipts before changing model files.
+The default-user access error seen with Ubuntu's direct Windows-drive mount
+did not reproduce in the Docker Desktop CRLF checks. The documented root-user
+command remains compatible with both tested Windows-host setups.
+
+Images were imported from archives of the already verified Docker Hub images
+on CLB-08 because the Windows credential helper could not operate in the SSH
+logon session. The loaded filesystem layers, architecture, operating system,
+entrypoint, command, environment, user, working directory and labels matched
+the source images. The published digests below still identify the tested image
+contents; no runtime or container code changed for this qualification.
+Installer identity, archive identities, engine/context records, commands,
+receipts and HDF inspections are retained with the external evidence.
+
+### Repeat from Windows PowerShell
+
+Use the Windows Docker CLI supplied by Docker Desktop and a new external
+work directory. The source model must have its terrain and projection siblings.
+
+```powershell
+docker context use desktop-linux
+docker pull rascommander/hec-ras-wine-precompute_6.5:v4
+python containers/hecras-prepare/test_preprocessing_inputs.py --image rascommander/hec-ras-wine-precompute_6.5:v4 --source-project "C:\models\02_model_copies\model\model.prj" --work-dir "C:\test-evidence\desktop-65-new" --container-user root
+```
+
+Repeat with the 6.6 image and another new work directory. The source-side
+runner accepts native Windows paths. Full run evidence is under
+`C:\Users\bill\ras2fim-reliability-20260910` on CLB-08; Desktop runs use
+`desktop-tests-6.5`, `desktop-tests-6.6`, `desktop-default-6.5`,
+`desktop-default-6.6` and `desktop powershell check`.
 
 ## Implementation and build inputs
 
