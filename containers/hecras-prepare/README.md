@@ -1,102 +1,129 @@
 # Linux/Wine HEC-RAS preprocessing
 
-The `hecras-prepare` image runs HEC-RAS geometry preprocessing through
-ras-commander and WineHQ Stable 11.0 on Linux. Each invocation prepares one
-existing HEC-RAS plan and writes the three files consumed by the repository's
-compute scripts:
+[Installed code and GitHub source](INSTALLED-CODE.md) lists the packaged scripts,
+links the current container source snapshot and public library references.
 
-- `<project>.p01.tmp.hdf`
-- `<project>.b01`
-- `<project>.x01`
+The container provides Wine so [ras-commander][rc] can call installed Windows
+HEC-RAS on Linux. It reads the model from a host folder mounted into the container
+and writes preprocessing files through that same mount.
 
-The later unsteady simulation continues to use the existing
-`civileng127/ras_v65:v0` compute image.
+For Andy's review, start with [Wine, installation paths, and host data](OPERATION.md#wine-the-hec-ras-installation-and-host-data)
+and the [API call sequence](OPERATION.md#exact-ras-commander-call-sequence).
+[How to Re-Create this Container](PREPARATION.md) is a separate build guide with
+installation notes, dependencies, and verification instructions. The
+[release verification record](RELEASE-VERIFICATION.md) contains test evidence.
 
-This Linux/Wine preprocessing integration was contributed by CLB Engineering
-Corporation.
+## Models created on Windows or Linux
 
-## Published images
+Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 image). Use a disposable model copy and mount its referenced terrain and projection
+folders. Relative paths are resolved inside the container: `..\source_terrain`
+and `..\projection` must lead to mounted folders. Mounting a model folder alone
+does not expose its siblings. The terrain HDF must also have access to its
+referenced TIFF files.
 
-Each Linux/amd64 image requires a runtime profile containing the same HEC-RAS
-version.
+Before HEC-RAS starts, [model_checks.py][build-checks] reads the selected plan, geometry and
+unsteady flow inputs, checks the existing 2D geometry HDF, and verifies the
+projection, terrain HDF and referenced raster files. Missing dependencies fail
+before any model file is modified.
 
-| HEC-RAS | Docker Hub | Immutable image |
+The worker then normalizes the selected `.prj`, `.p##`, `.g##` and `.u##` text
+files to Windows CRLF line endings, preserving all other bytes. LF, CRLF and
+mixed inputs are accepted. This is necessary even though the container runs on
+Linux: HEC-RAS is a Windows application under Wine. The generated `.x##` output
+is still converted to Linux LF for the separate Linux calculation stage.
+
+Before reporting success, the worker opens both the geometry HDF and temporary
+plan HDF. They must retain the input's 2D area names and cell counts and contain
+valid cell-volume and face-area elevation tables. Face counts may change when
+HEC-RAS versions rebuild a mesh. The receipt records the normalized input names,
+checked dependencies and HDF validation. A file's size, `File Type` attribute,
+or presence of a `/Results` group is not proof of valid preprocessing.
+
+The required starting model includes a populated geometry HDF, a `.rasmap`, a
+projection file and a terrain HDF with its rasters. Qualification covers the
+repository sample; it does not certify a complete hydraulic simulation.
+
+
+## Images
+
+| HEC-RAS | Image | Status |
 |---|---|---|
-| 6.5 | [hec-ras-wine-precompute_6.5](https://hub.docker.com/r/rascommander/hec-ras-wine-precompute_6.5) | `rascommander/hec-ras-wine-precompute_6.5@sha256:0eb3aa3dbd1cb174651bf74196ac66b448acd0fb4dbdcb5852d664da521ea7ca` |
-| 6.6 | [hec-ras-wine-precompute_6.6](https://hub.docker.com/r/rascommander/hec-ras-wine-precompute_6.6) | `rascommander/hec-ras-wine-precompute_6.6@sha256:4aa00301d6587f6fc073418655c585517e2a61a363c4898c144a21099f093c00` |
+| 6.5 | `rascommander/hec-ras-wine-precompute_6.5:v4` | Published, installed runtime and saved TCU state. |
+| 6.6 | `rascommander/hec-ras-wine-precompute_6.6:v4` | Published, installed runtime and saved TCU state. |
+| 7.0.1 | `rascommander/hec-ras-wine-precompute_7.0.1:v4` | Built and tested locally; publication pending. |
 
-## Runtime profile
+The 6.5 and 6.6 `latest` tags select their bundled releases. Normal jobs require
+no separate HEC-RAS installation or external runtime mount.
 
-HEC-RAS, Windows Python, and the ras-commander wheel are supplied at run time in
-a read-only Wine profile. The
-[runtime manifest example](runtime-manifest.example.json) records their paths,
-the HEC-RAS version, the ras-commander source commit and wheel hash, and hashes
-for the executable artifacts. The image verifies these values before starting
-HEC-RAS and clones the profile into private writable scratch for each job.
-
-Create the profile with the official HEC-RAS installer and accept its displayed
-Terms and Conditions for Use. The retained profile must contain that accepted
-user state. The worker calls `init_ras_project(..., accept_tcu=True)` so
-ras-commander transfers the state to the installed version and verifies it
-before preprocessing.
-
-Keep the runtime profile, installers, model data, and solver results outside the
-repository and container image.
-
-## Command-line interface
-
-The container entry point exposes one command:
-
-```text
-hecras-prepare prepare --project PATH [--plan 01] [--timeout 300]
-                       [--run-id ID] [--replace-generated]
-```
-
-| Option | Meaning |
-|---|---|
-| `--project PATH` | HEC-RAS `.prj` file inside the writable `/job` mount. |
-| `--plan NUMBER` | Plan number to preprocess. Default: `01`. |
-| `--timeout SECONDS` | Maximum HEC-RAS preprocessing time. Default: `300`. |
-| `--run-id ID` | Optional receipt identifier. An identifier is generated when omitted. |
-| `--replace-generated` | Clear and replace preprocessing files in a disposable project copy. |
-
-A successful job writes its receipt to
-`.ras-commander/runs/<run-id>/prepare.json` beneath the mounted project folder.
-The receipt identifies the runtime and records the size and SHA-256 hash of each
-output file.
+## Run
 
 ```bash
+docker pull rascommander/hec-ras-wine-precompute_6.5:v4
+
 docker run --rm --network none --read-only \
-  --user 1000:1000 --cpus 2 --memory 6g \
+  --user 1000:1000 --cpus 2 --memory 6g --memory-swap 6g \
+  --cap-drop ALL --security-opt no-new-privileges \
   --tmpfs /tmp:rw,nosuid,nodev,size=512m,mode=1777 \
-  --env RAS2FIM_JOB_ROOT=/job/project \
-  --mount type=bind,src=/shared/model,dst=/job/project \
-  --mount type=bind,src=/controlled/hecras-6.5-wine,dst=/runtime/wine-seed,readonly \
+  --env RAS2FIM_JOB_ROOT=/job \
+  --mount type=bind,src=/shared/model,dst=/job \
   --mount type=volume,dst=/run/ras-job \
   --device /dev/ntsync \
-  rascommander/hec-ras-wine-precompute_6.5@sha256:0eb3aa3dbd1cb174651bf74196ac66b448acd0fb4dbdcb5852d664da521ea7ca \
-  prepare --project /job/project/model.prj --plan 01 \
-          --timeout 900 --run-id example-0001 --replace-generated
+  rascommander/hec-ras-wine-precompute_6.5:v4 \
+  prepare --project /job/model.prj --plan 01 \
+          --timeout 900 --run-id example-001 --replace-generated
 ```
 
-Omit `--device /dev/ntsync` when NT synchronization is unavailable. The Windows
-Step 2b controller builds this command, starts the configured jobs in parallel,
-waits for the complete batch, validates every receipt and hash, and then stages
-the three output files for the existing compute scripts.
+`/shared/model` is a disposable folder on the Linux Docker host, writable by
+UID 1000. The container sees it as `/job`; generated files remain in that same
+host folder after the container exits. Mount terrain/projection dependencies
+where the model expects them. Use a unique run ID. `--replace-generated` can
+remove an existing final plan HDF, so preserve wanted results elsewhere.
 
-## Build
+The qualified host supplies `/dev/ntsync`; hosts without it require separate
+qualification. Read and agree to the [HEC-RAS terms](https://www.hec.usace.army.mil/confluence/rasdocs/rasum/6.6/terms-and-conditions-of-use)
+before use. [init_ras_project()][init] uses `accept_tcu=True` with the prepared
+profile's saved acceptance state.
 
-Build from the repository root. Licensed software is not part of the build
-context.
+For project `model`, plan 01 and geometry 01, the required outputs are
+`model.p01.tmp.hdf`, `model.b01`, and `model.x01`. The receipt is
+`.ras-commander/runs/<run-id>/prepare.json` under the model folder. Exit codes
+are 0 for success, 1 for a recorded failure, and 2 for configuration/I/O errors.
+Step 2b waits for the full batch before staging the next calculation stage.
 
-```bash
-docker buildx build --load --platform linux/amd64 \
-  --build-arg HEC_RAS_VERSION=6.5 \
-  --build-arg RAS_COMMANDER_COMMIT=9e4217713e954236b0c16023e1815c6f2b7a5309 \
-  --build-arg RAS_COMMANDER_WHEEL_SHA256=dc0c2f9baa9db66afee01e34eb00d7a04f53e7b82c3340c786b2e9aef1795932 \
-  --tag hecras-prepare:6.5 \
-  --file containers/hecras-prepare/Dockerfile .
-```
+## Build and inspection
 
-Use `HEC_RAS_VERSION=6.6` for the 6.6 image. At run time, mount the matching
-profile and select an image pinned by its digest.
+Follow [How to Re-Create this Container](PREPARATION.md) to export a finalized
+Wine profile and build with the external `hecras_runtime` context. The build
+currently depends on retained installed profiles; a complete empty-prefix
+installation procedure remains unfinished. The [inventory](runtime-inventory-20260910.json)
+records installed software, and [release verification](RELEASE-VERIFICATION.md)
+records exact image identities and test results.
+
+Published Docker Hub documentation copies: [6.5](dockerhub/6.5.md),
+[6.6](dockerhub/6.6.md), [7.0.1](dockerhub/7.0.1.md).
+
+## Optional runtime override
+
+Leave `str_wine_profile` blank to use the bundled installation. Advanced users
+can supply a matching controlled profile at `/runtime/wine-seed` read-only.
+It must declare the selected HEC-RAS version and matching [ras-commander][rc]
+build in its [runtime manifest](runtime-manifest.example.json). The default
+job uses the installation already included in the image.
+
+[rc]: https://rascommander.info/ras/
+[rc-github]: https://github.com/gpt-cmdr/ras-commander
+[ras-prj]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L125
+[init]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L2462
+[plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L787
+[clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/geom/GeomPreprocessor.py#L1152
+[run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L1394
+[preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L97
+[tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L270
+[tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L449
+[bco]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L25
+[logging]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L95
+[monitor]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L144
+[terminate]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L964
+[result]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/ComputeResults.py#L185
+
+[build-checks]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py

@@ -32,7 +32,6 @@ def _load_settings(str_config_file_path):
         "linux_share",
         "prepare_image",
         "prepare_version",
-        "wine_profile",
     ):
         value = section.get("str_" + name, "").strip()
         if not value:
@@ -43,7 +42,10 @@ def _load_settings(str_config_file_path):
         raise ValueError("str_prepare_image must be pinned by SHA-256")
     if not re.fullmatch(r"[0-9]+\.[0-9]+(?:\.[0-9]+)?", settings["prepare_version"]):
         raise ValueError("str_prepare_version must be a dotted HEC-RAS version")
+    settings["wine_profile"] = section.get("str_wine_profile", "").strip()
     for name in ("linux_share", "wine_profile"):
+        if name == "wine_profile" and not settings[name]:
+            continue
         if not PurePosixPath(settings[name]).is_absolute():
             raise ValueError("str_" + name + " must be an absolute Linux path")
 
@@ -134,9 +136,12 @@ def _container_command(settings, project, timeout_seconds, run_id):
         "--mount", "type=bind,src=" + _remote_path(settings, project.parent) + ",dst=/job/project",
         "--mount", "type=bind,src=" + _remote_path(settings, model_root / "source_terrain") + ",dst=/job/source_terrain,readonly",
         "--mount", "type=bind,src=" + _remote_path(settings, model_root / "projection") + ",dst=/job/projection,readonly",
-        "--mount", "type=bind,src=" + settings["wine_profile"] + ",dst=/runtime/wine-seed,readonly",
         "--mount", "type=volume,dst=/run/ras-job",
     ]
+    if settings.get("wine_profile"):
+        arguments.extend([
+            "--mount", "type=bind,src=" + settings["wine_profile"] + ",dst=/runtime/wine-seed,readonly",
+        ])
     if settings["use_ntsync"]:
         arguments.extend(["--device", "/dev/ntsync"])
     arguments.extend([

@@ -82,9 +82,9 @@ The RAS2FIM-2D stack runs across Windows and a Linux Docker host:
 
 Complete all four setup steps before running the pipeline.
 
-### 1. Prepare the HEC-RAS v6.5 Wine profile (Linux host)
+### 1. Use the bundled HEC-RAS v6.5 runtime (Linux host)
 
-Create the read-only HEC-RAS v6.5 Wine runtime profile described in [container documentation](containers/hecras-prepare/README.md), using the official installer and accepting its displayed Terms and Conditions for Use. The profile must retain an accepted HEC-RAS user state. Before each headless launch, ras-commander explicitly transfers that state to the selected installed version in the disposable job profile and verifies the target state. The licensed runtime stays outside this repository and outside the preprocessing image. Windows does not run HEC-RAS locally.
+The `v4` preprocessing images include HEC-RAS, Windows Python, ras-commander, and a prepared Wine profile. No separate installation or runtime-profile mount is required. Review and agree to the HEC-RAS Terms and Conditions for Use before running the included software. Each job verifies the embedded runtime and creates its own writable Wine profile. See [container documentation](containers/hecras-prepare/README.md) for the run command, release details, and optional external-profile overrides. Windows does not run HEC-RAS locally. For a plain-language walkthrough, see [what happens inside the container](containers/hecras-prepare/OPERATION.md). The [three-version verification record](containers/hecras-prepare/RELEASE-VERIFICATION.md) includes the tested 7.0.1 candidate, whose Docker Hub publication is pending approval.
 
 ### 2. Install `nccopy` (local Windows machine)
 
@@ -93,7 +93,7 @@ Install `nccopy` (from the Unidata netCDF utilities) on the local Windows machin
 ### 3. Pull the Docker images
 
 ```
-docker pull rascommander/hec-ras-wine-precompute_6.5@sha256:0eb3aa3dbd1cb174651bf74196ac66b448acd0fb4dbdcb5852d664da521ea7ca
+docker pull rascommander/hec-ras-wine-precompute_6.5@sha256:50622b26c2c210c9034a38500aa8048e84c129dc0fbf2aa348fbc3c1e368c597
 docker pull civileng127/ras_v65:v0
 docker pull civileng127/ras2fim2d:v01
 ```
@@ -133,7 +133,7 @@ flowchart TD
     B --> C[Shared folder<br/>02_model_copies]
     C --> D[Phase 2: Windows Python<br/>Step 2]
     D --> E[Linux/Wine HEC-RAS preprocessors<br/>6.5 or 6.6, up to four in parallel]
-    E --> F[Wait for all receipts and artifact hashes]
+    E --> F[Wait for every preprocessing job to succeed]
     F --> G[Shared folder<br/>02b_prep_for_ras]
     G --> H[Create the existing compute scripts]
     H --> I[Phase 3: Existing HEC-RAS 6.5<br/>compute containers in parallel]
@@ -172,27 +172,16 @@ docker run -it ^
 
 ## Phase 2 — Create the temporary HDF files on the Linux Docker host
 
-The Windows Phase 2 command below does not change. Configure the Linux host,
-the Windows and Linux names for the shared work folder, the Wine profile, and
-the immutable preparation image in `config_global_windows.ini`.
-
-For example, the configured roots translate
-`E:\mac_test_output_video\02_model_copies\model` to
-`/mnt/ras2fim-2d-work/mac_test_output_video/02_model_copies/model`.
-Step 2b applies that mapping to every generated project, starts up to four
-two-core preparation containers over SSH, and waits for all of them. After all
-receipts and artifact hashes pass validation, it stages each `.p01.tmp.hdf`,
-`.b01`, and `.x01` file and writes the existing compute scripts. The container
-command does not need to be run manually for each project.
+Set the Linux host, corresponding Windows/Linux shared-folder roots, and immutable preprocessing image in `config_global_windows.ini`. Leave `str_wine_profile` blank to use the bundled runtime. Run step 2 from the Windows conda environment. Windows creates the model copies, starts up to four two-core preprocessing containers over SSH, and waits for every container to finish. After all jobs and their output files pass validation, it stages each `.p01.tmp.hdf`, `.b01`, and `.x01` file and writes the existing compute scripts.
 
 ```ini
 [03_run_hec_ras]
 str_linux_host = user@linux-host
 str_windows_share = E:\
 str_linux_share = /mnt/ras2fim-2d-work
-str_prepare_image = rascommander/hec-ras-wine-precompute_6.5@sha256:0eb3aa3dbd1cb174651bf74196ac66b448acd0fb4dbdcb5852d664da521ea7ca
+str_prepare_image = rascommander/hec-ras-wine-precompute_6.5@sha256:50622b26c2c210c9034a38500aa8048e84c129dc0fbf2aa348fbc3c1e368c597
 str_prepare_version = 6.5
-str_wine_profile = /opt/hec-ras/profiles/wine-6.5
+str_wine_profile =
 int_prepare_cores_per_job = 2
 int_prepare_memory_gb = 6
 b_use_ntsync = True
@@ -233,7 +222,7 @@ docker run -it ^
 
 # Docker (Reference)
 
-RAS2FIM-2D uses Docker to provide a reproducible processing environment. HEC-RAS v6.5 preprocessing runs through the [Linux/Wine preprocessing image](containers/hecras-prepare/README.md), contributed by CLB Engineering Corporation. The subsequent simulations use the existing containerized HEC-RAS 6.5 runtime.
+RAS2FIM-2D uses Docker to provide a reproducible processing environment. HEC-RAS v6.6 preprocessing runs through the [Linux/Wine preprocessing image](containers/hecras-prepare/README.md), contributed by CLB Engineering Corporation. The subsequent simulations use the existing containerized HEC-RAS 6.5 runtime.
 
 ## Build the RAS2FIM-2D image (optional, for developers)
 

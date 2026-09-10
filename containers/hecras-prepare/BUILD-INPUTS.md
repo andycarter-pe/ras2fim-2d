@@ -52,12 +52,12 @@ provides library reference code; it does not replace the retained build input.
 
 ## Input preparation and output validation
 
-`model_checks.py`, installed at `/opt/hecras-prepare/model_checks.py`, verifies
+[model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py), installed at `/opt/hecras-prepare/model_checks.py`, verifies
 model dependencies, normalizes selected HEC-RAS input text to Windows CRLF,
 and validates the 2D mesh and hydraulic tables in both output HDF files. It uses
 the h5py and NumPy packages already installed in the Windows Python runtime.
 The image Dockerfile copies this module with the controller and worker.
 
-`test_preprocessing_inputs.py` is a source-side Docker regression runner for
+[test_preprocessing_inputs.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/test_preprocessing_inputs.py) is a source-side Docker regression runner for
 Windows and Linux callers. It retains separate disposable LF, CRLF, mixed and
 missing-dependency test cases outside Git. It is not installed in the image.
