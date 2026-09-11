@@ -1,8 +1,9 @@
 # Preprocessing release verification — September 10, 2026
 
 The 6.5 and 6.6 `v4` and `latest` images contain input normalization and HDF
-validation. The 7.0.1 candidate passed the same checks locally; its binary
-publication still awaits the separate approval recorded in AGENTS.md.
+validation. The 7.0.1 image passed the same checks locally on September 10.
+It was subsequently authorized, qualified on Windows Docker Desktop, and
+published on September 11; see the dated addendum below.
 
 ## Verified behavior
 
@@ -61,7 +62,8 @@ Use `--user root` for Windows drive mounts. UID 1000 remains qualified for
 writable Linux model folders. A failure after HEC-RAS starts can leave partial
 model outputs, so use disposable copies and require a successful, validated
 receipt before staging computation. Docker Desktop's default-user results are
-recorded separately below. HEC-RAS 7.0.1 has not been qualified on this Windows host.
+recorded separately below. HEC-RAS 7.0.1 was not part of this Ubuntu-WSL
+matrix; its September 11 Docker Desktop qualification is recorded below.
 
 ### Repeat the Ubuntu WSL cases
 
@@ -167,3 +169,22 @@ The current software inventory is [runtime-inventory-20260910.json](runtime-inve
 
 - 6.5: `sha256:50622b26c2c210c9034a38500aa8048e84c129dc0fbf2aa348fbc3c1e368c597` (`v4` and `latest`).
 - 6.6: `sha256:b84b1cce0c73b8422c432a11167587a79a2bc2588b7a5d54904275dcf7af7e4a` (`v4` and `latest`).
+
+## HEC-RAS 7.0.1 publication — September 11, 2026
+
+The user explicitly approved 7.0.1 publication. The [Wine image](https://hub.docker.com/r/rascommander/hec-ras-wine-precompute_7.0.1)
+is public as `v4` and `latest`, digest `sha256:05bd9a0a272381857e0267734fa8ff287659535181ed4ce0c8e259642b65840d`.
+A fresh runtime audit verified the installed executable and saved TCU state.
+
+The full Linux 266-hour sample passed preprocessing, retaining all 6,548 mesh
+coordinates and hydraulic tables in a 4,676,123-byte temporary HDF. The matching
+native Linux 7.0.1 image completed all 267 output times with finite water-surface
+values. Windows Docker Desktop 29.7.2 passed all 10 notebook code cells for an
+explicit one-hour demo in a Windows directory containing spaces. Its temporary
+HDF was 4,674,075 bytes; native output contained two times across 6,548 columns.
+Both hosts preserved the prepared temporary HDF after native computation.
+
+The [7.0.1 release record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-7.0.1-20260911.md) documents installed sources, runtime
+acquisition, image identities, observed storage recovery, and test limits.
+The [notebook](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/examples/512_docker_precompute_and_linux_compute.ipynb) and [operating guide](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/docs/user-guide/container-execution.md) provide the
+matching two-container API workflow. Publication and anonymous pulls were verified.

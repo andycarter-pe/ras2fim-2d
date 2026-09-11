@@ -9,14 +9,20 @@ The container provides Wine so [ras-commander][rc] can call installed Windows
 HEC-RAS on Linux. It takes an existing model, prepares inputs for a separate
 calculation stage, and leaves those files in the host's mounted working folder.
 
-The bundled 6.5 and 6.6 images are published. The bundled 7.0.1 image is installed
-and tested locally; publication is pending. The operating sequence is the same
+The bundled 6.5, 6.6 and 7.0.1 images are published with installed runtimes
+and saved TCU acceptance. The operating sequence is the same
 for each selected runtime. The path example below uses 6.5; other HEC-RAS
 releases use their matching installation directories.
 
+The matching [7.0.1 native Linux image](https://hub.docker.com/r/rascommander/hec-ras-linux-unsteady_7.0.1) completes the unsteady
+calculation after preprocessing. The [Python operating guide](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/docs/user-guide/container-execution.md) and
+[notebook](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/examples/512_docker_precompute_and_linux_compute.ipynb) show both stages through [ras-commander][rc].
+See the [7.0.1 release record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-7.0.1-20260911.md) for full Linux and Windows Docker
+Desktop qualification.
+
 ## Models created on Windows or Linux
 
-Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 image). Use a disposable model copy and mount its referenced terrain and projection
+Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 or 7.0.1 image). Use a disposable model copy and mount its referenced terrain and projection
 folders. Relative paths are resolved inside the container: `..\source_terrain`
 and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
@@ -75,7 +81,8 @@ prepared prefix at `/runtime/wine-seed/prefix` and its settings in
 
 At startup the wrapper copies the prepared prefix into the job's private
 scratch directory and sets `WINEPREFIX` to that copy. Wine can update its
-registry and temporary state there. The installed template stays protected.
+registry and temporary state in that private copy. The worker reads the
+installed template when making the copy; normal job updates use the copy.
 Windows Python is `C:\Python311\python.exe`; Xvfb supplies a virtual screen
 for the Windows application. No interactive desktop is needed for a prepared job.
 
@@ -106,9 +113,9 @@ flowchart LR
 |---|---|
 | Host model folder mounted at `/job` | Read/write. Inputs, edited plans, generated files, logs, and receipts remain on the host after the container exits. |
 | Referenced terrain/projection mounts | Usually read-only; their mounted paths must match the model's references. |
-| `/runtime/wine-seed` | Installed template included in the image; protected from job writes. |
-| `/run/ras-job/<run-id>` | Private Wine prefix and intermediate worker files in temporary scratch. |
-| `/tmp` | Temporary memory-backed storage for the running container. |
+| `/runtime/wine-seed` | Installed template included in the image; the worker copies it for each job. |
+| `/run/ras-job/<run-id>` | Private Wine prefix and intermediate worker files in the container's writable layer. |
+| `/tmp` | Temporary storage in the container's writable layer for the command below. |
 
 The bind-mount `src` path belongs to the machine running the Docker daemon.
 When Docker is started over SSH, use that Linux host's path. A Windows
@@ -119,7 +126,7 @@ On Linux filesystems, use a disposable model copy writable by UID 1000.
 For Windows drive mounts, use `--user root`; see the [Windows command](README.md#run-on-a-windows-drive). The job edits preprocessing
 settings and can replace generated files, including an existing final plan HDF
 when `--replace-generated` is set. The documented `--rm` run removes the
-container and its anonymous scratch volume; the bind-mounted model folder remains.
+container and its writable layer; the bind-mounted model folder remains.
 
 ## Exact ras-commander call sequence
 

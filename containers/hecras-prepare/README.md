@@ -13,9 +13,15 @@ and the [API call sequence](OPERATION.md#exact-ras-commander-call-sequence).
 installation notes, dependencies, and verification instructions. The
 [release verification record](RELEASE-VERIFICATION.md) contains test evidence.
 
+The matching [7.0.1 native Linux image](https://hub.docker.com/r/rascommander/hec-ras-linux-unsteady_7.0.1) completes the unsteady
+calculation after preprocessing. The [Python operating guide](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/docs/user-guide/container-execution.md) and
+[notebook](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/examples/512_docker_precompute_and_linux_compute.ipynb) show both stages through [ras-commander][rc].
+See the [7.0.1 release record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-7.0.1-20260911.md) for full Linux and Windows Docker
+Desktop qualification.
+
 ## Models created on Windows or Linux
 
-Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 image). Use a disposable model copy and mount its referenced terrain and projection
+Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 or 7.0.1 image). Use a disposable model copy and mount its referenced terrain and projection
 folders. Relative paths are resolved inside the container: `..\source_terrain`
 and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
@@ -58,16 +64,16 @@ repository sample; it does not certify a complete hydraulic simulation.
 |---|---|---|
 | 6.5 | `rascommander/hec-ras-wine-precompute_6.5:v4` | Published, installed runtime and saved TCU state. |
 | 6.6 | `rascommander/hec-ras-wine-precompute_6.6:v4` | Published, installed runtime and saved TCU state. |
-| 7.0.1 | `rascommander/hec-ras-wine-precompute_7.0.1:v4` | Built and tested locally; publication pending. |
+| 7.0.1 | `rascommander/hec-ras-wine-precompute_7.0.1:v4` | Published, installed runtime and saved TCU state. |
 
-The 6.5 and 6.6 `latest` tags select their bundled releases. Normal jobs require
+The 6.5, 6.6 and 7.0.1 `latest` tags select their bundled releases. Normal jobs require
 no separate HEC-RAS installation or external runtime mount.
 
 ## Run on a Windows drive
 
 The following PowerShell command mounts the model and both dependency folders.
 Set `$models` to the parent folder containing all three and `$name` to the
-project filename without `.prj`. For HEC-RAS 6.6, use the matching 6.6 image.
+project filename without `.prj`. For HEC-RAS 6.6 or 7.0.1, use its matching image.
 
 ```powershell
 $models = 'E:\mac_test_output_Sept12\02_model_copies'
