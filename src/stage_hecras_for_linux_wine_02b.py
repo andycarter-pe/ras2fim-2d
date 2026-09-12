@@ -53,8 +53,10 @@ def _load_settings(str_config_file_path):
     settings["cores_per_job"] = section.getint("int_prepare_cores_per_job", fallback=2)
     settings["memory_gb"] = section.getint("int_prepare_memory_gb", fallback=6)
     settings["use_ntsync"] = section.getboolean("b_use_ntsync", fallback=True)
-    if settings["cores_per_job"] < 1 or settings["memory_gb"] < 1:
-        raise ValueError("Preparation CPU and memory limits must be positive")
+    if not 1 <= settings["cores_per_job"] <= 8:
+        raise ValueError("int_prepare_cores_per_job must be an integer from 1 to 8")
+    if settings["memory_gb"] < 1:
+        raise ValueError("Preparation memory limit must be positive")
     return settings
 
 
@@ -149,6 +151,7 @@ def _container_command(settings, project, timeout_seconds, run_id):
         "prepare",
         "--project", "/job/project/" + project.name,
         "--plan", "01",
+        "--num-cores", str(settings["cores_per_job"]),
         "--timeout", str(int(timeout_seconds)),
         "--run-id", run_id,
         "--replace-generated",
@@ -182,6 +185,9 @@ def _validate_receipt(settings, project, run_id):
     runtime = receipt.get("runtime", {})
     if runtime.get("kind") != "wine" or runtime.get("hec_ras_version") != settings["prepare_version"]:
         raise ValueError("Preparation receipt has the wrong HEC-RAS runtime")
+    num_cores = receipt.get("arguments", {}).get("num_cores")
+    if isinstance(num_cores, bool) or not isinstance(num_cores, int) or num_cores != settings["cores_per_job"]:
+        raise ValueError("Preparation receipt has the wrong HEC-RAS core count")
     result = receipt.get("result", {})
     if (
         result.get("timed_out") is not False

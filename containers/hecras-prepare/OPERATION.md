@@ -154,6 +154,9 @@ sequenceDiagram
     W->>C: init_ras_project(..., accept_tcu=True)
     C->>C: RasTcu.status() and RasTcu.accept() if needed
     W->>C: RasPlan.get_plan_path(...)
+    W->>C: RasPlan.set_num_cores(..., num_cores)
+    W->>C: RasPlan.set_2d_flow_options(..., cores=num_cores, include_default=True)
+    W->>C: RasPlan.get_plan_value(..., "UNET D2 Cores")
     W->>C: GeomPreprocessor.clear_geompre_files(...)
     W->>C: RasPlan.update_run_flags(..., geometry_preprocessor=True)
     W->>C: RasPreprocess.preprocess_plan(...)
@@ -178,6 +181,9 @@ mount. The worker returns its result to the wrapper, which writes the job receip
 | [RasPrj()][ras-prj] | Creates the project object passed to subsequent calls as `ras_object`. |
 | [init_ras_project()][init] | `project`, `ras_version=ras_executable`, `ras_object=ras_object`, `load_results_summary=False`, `load_hdf_metadata=False`, `hide_intro=True`, `accept_tcu=True`. Selects the installed executable and initializes project data. |
 | [RasPlan.get_plan_path()][plan-path] | `plan, ras_object=ras_object`. Resolves the selected plan file; a missing plan stops the worker. |
+| [RasPlan.set_num_cores()][plan-cores] | `plan_path, num_cores, ras_object=ras_object, refresh_dataframes=False`. Sets existing 1D, 2D, and pipe-system core entries before preprocessing. |
+| [RasPlan.set_2d_flow_options()][plan-2d] | `plan_path, cores=num_cores, include_default=True, ras_object=ras_object`. Sets every named 2D mesh and the existing default block, inserting missing 2D core entries. |
+| [RasPlan.get_plan_value()][plan-value] | `plan_path, "UNET D2 Cores", ras_object=ras_object`. Confirms an explicit 2D count before HEC-RAS starts. |
 | [GeomPreprocessor.clear_geompre_files()][clear-geom] | `plan_path, ras_object=ras_object`. Clears the matching geometry preprocessing cache and refreshes geometry metadata. |
 | [RasPlan.update_run_flags()][run-flags] | `plan_path, geometry_preprocessor=True, ras_object=ras_object`. Enables geometry preprocessing in the working plan. |
 | [RasPreprocess.preprocess_plan()][preprocess] | `plan, ras_object=ras_object, max_wait=timeout, clear_existing=replace_generated, fix_line_endings=True`. Starts and supervises HEC-RAS and returns its preprocessing result. |
@@ -196,6 +202,13 @@ The wrapper launches Windows Python with
 path and translated worker arguments. Inside [RasPreprocess.preprocess_plan()][preprocess],
 a Windows Python subprocess launches the full executable path as
 `"Ras.exe" -c "<project.prj>" "<project.p01>"` with `shell=False`.
+
+The CPU calls above are part of this source checkout and require a rebuilt,
+qualified image before publication. The controller and Windows worker accept
+`--num-cores` from 1 to 8, defaulting to 2. Pass the same number to Docker
+`--cpus` to match its CPU-time limit to the plan's solver setting. The controller
+passes the count to the worker and records `arguments.num_cores` in both success
+and failure receipts. The worker's returned count must match the request.
 
 [BcoMonitor.monitor_until_signal()][monitor] watches for
 `Starting Unsteady Flow Computations`. The alternate signal requires a
@@ -259,6 +272,9 @@ The [release verification record](RELEASE-VERIFICATION.md) contains the test evi
 [plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L787
 [clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/geom/GeomPreprocessor.py#L1152
 [run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L1394
+[plan-cores]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
+[plan-2d]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
+[plan-value]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
 [preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L97
 [tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L270
 [tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L449

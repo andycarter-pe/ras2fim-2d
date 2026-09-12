@@ -123,6 +123,37 @@ For project `model`, plan 01 and geometry 01, the required outputs are
 are 0 for success, 1 for a recorded failure, and 2 for configuration/I/O errors.
 Step 2b waits for the full batch before staging the next calculation stage.
 
+## CPU settings in this checkout
+
+The `prepare --num-cores N` option defaults to 2 and accepts integers from 1 to
+8. Set Docker's `--cpus N` to the same count: Docker limits the container's CPU
+time, while [RasPlan.set_num_cores()][plan-cores] and
+[RasPlan.set_2d_flow_options()][plan-2d] write the selected count into the working
+plan before HEC-RAS starts. The 2D call also inserts a missing setting in each
+mesh. Each container still prepares one plan; batch scheduling happens on the
+host. The receipt records the count as `arguments.num_cores`.
+
+This option requires an image built from this checkout; build and qualify it
+before using the option with a published tag. For a locally built image named
+`hecras-prepare:cpu-aligned`, the command shape is:
+
+```bash
+docker run --rm --cpus 2 --mount type=bind,src=/shared/model,dst=/job \
+  hecras-prepare:cpu-aligned prepare --project /job/model.prj --plan 01 \
+  --num-cores 2 --timeout 900 --replace-generated
+```
+
+Add the terrain and projection mounts described above for the selected model.
+The equivalent PowerShell command uses the same pair of CPU settings:
+
+```powershell
+docker run --rm --user root --cpus 2 --mount 'type=bind,src=C:\models\disposable,dst=/job' hecras-prepare:cpu-aligned prepare --project /job/model.prj --plan 01 --num-cores 2 --timeout 900 --replace-generated
+```
+
+Step 2b reads `int_prepare_cores_per_job` from `[03_run_hec_ras]`, defaults to 2,
+and accepts 1 through 8. It passes the count to both Docker and the worker and
+checks the receipt before staging the generated files.
+
 ## Build and inspection
 
 Follow [How to Re-Create this Container](PREPARATION.md) to export a finalized
@@ -150,6 +181,8 @@ job uses the installation already included in the image.
 [plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L787
 [clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/geom/GeomPreprocessor.py#L1152
 [run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L1394
+[plan-cores]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
+[plan-2d]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
 [preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L97
 [tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L270
 [tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L449

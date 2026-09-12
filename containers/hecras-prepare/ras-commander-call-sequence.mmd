@@ -15,6 +15,9 @@ sequenceDiagram
     W->>C: init_ras_project(..., accept_tcu=True)
     C->>C: RasTcu.status() and RasTcu.accept() if needed
     W->>C: RasPlan.get_plan_path(...)
+    W->>C: RasPlan.set_num_cores(..., num_cores)
+    W->>C: RasPlan.set_2d_flow_options(..., cores=num_cores, include_default=True)
+    W->>C: RasPlan.get_plan_value(..., "UNET D2 Cores")
     W->>C: GeomPreprocessor.clear_geompre_files(...)
     W->>C: RasPlan.update_run_flags(..., geometry_preprocessor=True)
     W->>C: RasPreprocess.preprocess_plan(...)

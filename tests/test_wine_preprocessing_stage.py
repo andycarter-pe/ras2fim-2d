@@ -82,6 +82,7 @@ def write_receipt(project, run_id):
         "plan": "01",
         "geometry": "01",
         "runtime": {"kind": "wine", "hec_ras_version": "6.6"},
+        "arguments": {"num_cores": 2},
         "result": {
             "timed_out": False,
             "full_result_copied": False,
@@ -162,7 +163,54 @@ def test_receipt_validation_rehashes_all_three_handoff_files(generated_models):
         stage._validate_receipt(settings, project, "run-1")
 
 
-def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch):
+@pytest.mark.parametrize("value", [None, "1", "2", "8"])
+def test_host_core_configuration_matches_container_and_solver(generated_models, value):
+    config_path, _, _, projects = generated_models
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(config_path)
+    if value is None:
+        config["03_run_hec_ras"].pop("int_prepare_cores_per_job")
+    else:
+        config["03_run_hec_ras"]["int_prepare_cores_per_job"] = value
+    with config_path.open("w", encoding="utf-8") as stream:
+        config.write(stream)
+    settings = stage._load_settings(config_path)
+    command = stage._container_command(settings, projects[0], 300, "core-test")
+    expected = value or "2"
+    assert command[command.index("--cpus") + 1] == expected
+    assert command[command.index("--num-cores") + 1] == expected
+
+
+@pytest.mark.parametrize("value", ["0", "9", "-1", "2.5", "True"])
+def test_host_rejects_unsupported_core_configuration(generated_models, value):
+    config_path, _, _, _ = generated_models
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(config_path)
+    config["03_run_hec_ras"]["int_prepare_cores_per_job"] = value
+    with config_path.open("w", encoding="utf-8") as stream:
+        config.write(stream)
+    with pytest.raises(ValueError):
+        stage._load_settings(config_path)
+
+
+@pytest.mark.parametrize("num_cores", [None, 8, True, "2", 2.0])
+def test_host_requires_receipt_to_confirm_requested_core_count(generated_models, num_cores):
+    config, _, _, projects = generated_models
+    settings = stage._load_settings(config)
+    project = projects[0]
+    write_outputs(project)
+    write_receipt(project, "cores")
+    receipt_path = project.parent / ".ras-commander/runs/cores/prepare.json"
+    receipt = json.loads(receipt_path.read_text())
+    receipt["arguments"]["num_cores"] = num_cores
+    receipt_path.write_text(json.dumps(receipt))
+    with pytest.raises(ValueError, match="wrong HEC-RAS core count"):
+        stage._validate_receipt(settings, project, "cores")
+
+
+@pytest.mark.parametrize("num_cores", [None, 1, 2, 8])
+@pytest.mark.parametrize("applied", [True, False])
+def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch, num_cores, applied):
     import types
 
     worker = load_container_script("windows_worker")
@@ -204,12 +252,27 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
             return plan_path
 
         @staticmethod
+        def set_num_cores(path, count, *, ras_object, refresh_dataframes):
+            calls["cores"] = (path, count, ras_object, refresh_dataframes)
+
+        @staticmethod
+        def set_2d_flow_options(path, *, cores, include_default, ras_object):
+            calls["mesh_cores"] = (path, cores, include_default, ras_object)
+
+        @staticmethod
+        def get_plan_value(path, key, *, ras_object):
+            assert path == plan_path
+            assert key == "UNET D2 Cores"
+            return calls["cores"][1] if applied else None
+
+        @staticmethod
         def update_run_flags(path, *, ras_object, **flags):
             calls["flags"] = flags
 
     class FakePreprocess:
         @staticmethod
         def preprocess_plan(plan, **kwargs):
+            assert "cores" in calls
             calls["prepare"] = (plan, kwargs)
             return FakeResult()
 
@@ -232,7 +295,7 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
         },
     )
 
-    result = worker.run_worker(
+    arguments = (
         str(tmp_path / "Model.prj"),
         "01",
         "C:/HEC-RAS/6.6/Ras.exe",
@@ -241,13 +304,109 @@ def test_wine_worker_uses_ras_commander_preprocessing_api(tmp_path, monkeypatch)
         300,
         True,
     )
+    options = {} if num_cores is None else {"num_cores": num_cores}
+    if not applied:
+        with pytest.raises(RuntimeError, match="no effective UNET D2 Cores setting"):
+            worker.run_worker(*arguments, **options)
+        assert "prepare" not in calls
+        return
+    result = worker.run_worker(*arguments, **options)
 
     assert result["success"] is True
     assert calls["init"]["accept_tcu"] is True
     assert calls["clear"][0] == plan_path
+    assert calls["cores"] == (plan_path, num_cores or 2, calls["init"]["ras_object"], False)
+    assert calls["mesh_cores"] == (plan_path, num_cores or 2, True, calls["init"]["ras_object"])
+    assert result["num_cores"] == (num_cores or 2)
     assert calls["flags"] == {"geometry_preprocessor": True}
     assert calls["prepare"][1]["max_wait"] == 300
     assert calls["prepare"][1]["clear_existing"] is True
+    assert calls["prepare"][1]["fix_line_endings"] is True
+
+
+@pytest.mark.parametrize("script", ["prepare", "windows_worker"])
+@pytest.mark.parametrize("value", ["0", "9", "-1", "2.0", "two"])
+def test_core_cli_rejects_out_of_range_and_noninteger_values(script, value):
+    module = load_container_script(script)
+    args = ["prepare", "--project", "model.prj"] if script == "prepare" else [
+        "--project", "model.prj", "--plan", "01", "--ras-executable", "Ras.exe",
+        "--ras-commander-wheel", "runtime.whl", "--expected-ras-commander-wheel-sha256",
+        "d" * 64, "--timeout", "300", "--result", "result.json",
+    ]
+    with pytest.raises(SystemExit) as exc:
+        module.build_parser().parse_args(args + ["--num-cores", value])
+    assert exc.value.code == 2
+
+
+@pytest.mark.parametrize("num_cores", [0, 9, -1, 2.0, "2", True, None])
+def test_core_validation_precedes_runtime_or_model_access(tmp_path, monkeypatch, num_cores):
+    prepare = load_container_script("prepare")
+    worker = load_container_script("windows_worker")
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid core count must fail before runtime access")
+
+    monkeypatch.setattr(prepare, "load_runtime", forbidden)
+    monkeypatch.setattr(worker, "verify_ras_commander", forbidden)
+    with pytest.raises(prepare.JobError, match="integer from 1 to 8"):
+        prepare.run_prepare("missing.prj", "01", 300, False, "invalid", tmp_path,
+                            "runtime.json", "6.5", num_cores=num_cores)
+    with pytest.raises(ValueError, match="integer from 1 to 8"):
+        worker.run_worker("missing.prj", "01", "Ras.exe", "runtime.whl", "d" * 64,
+                          300, False, num_cores=num_cores)
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("num_cores", [None, 1, 8])
+@pytest.mark.parametrize("returned_cores", [None, "requested"])
+def test_controller_propagates_cores_and_records_receipt(tmp_path, monkeypatch, num_cores, returned_cores):
+    from types import SimpleNamespace
+
+    prepare = load_container_script("prepare")
+    project = write_project(tmp_path, "core-test")
+    prefix = tmp_path / "seed"
+    prefix.mkdir()
+    monkeypatch.setenv("RAS2FIM_SCRATCH_ROOT", str(tmp_path / "scratch"))
+    runtime = {
+        "identity": {"kind": "wine", "hec_ras_version": "6.5"},
+        "prefix": prefix, "wheel_sha": "d" * 64,
+        "windows_python": "python.exe", "ras_executable": "Ras.exe",
+        "ras_commander_wheel": "runtime.whl",
+    }
+    monkeypatch.setattr(prepare, "load_runtime", lambda *args: runtime)
+    commands = []
+    expected = num_cores or 2
+
+    def runner(command, environment, timeout):
+        if command[0] == "winepath":
+            return SimpleNamespace(returncode=0, stdout=command[-1], stderr="")
+        commands.append(command)
+        assert command[command.index("--num-cores") + 1] == str(expected)
+        outputs = prepare.expected_outputs(project, "01", "01")
+        for output in outputs:
+            output.write_bytes(b"prepared artifact")
+        payload = {
+            "success": True, "plan": "01", "geometry": "01",
+            "num_cores": expected if returned_cores == "requested" else None,
+            "timed_out": False, "full_result_copied": False, "signal_source": "bco",
+            "ras_commander_wheel_sha256": "d" * 64,
+            "hdf_validation": {"geometry": {"area": {}}, "temporary_plan": {"area": {}}},
+            **dict(zip(("tmp_hdf_path", "b_file_path", "x_file_path"), map(str, outputs))),
+        }
+        Path(command[command.index("--result") + 1]).write_text(json.dumps(payload))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    options = {} if num_cores is None else {"num_cores": num_cores}
+    success, receipt_path = prepare.run_prepare(
+        project, "01", 300, False, "cores", project.parent, "runtime.json", "6.5",
+        runner=runner, **options,
+    )
+    receipt = json.loads(receipt_path.read_text())
+    assert len(commands) == 1
+    assert receipt["arguments"]["num_cores"] == expected
+    assert success is (returned_cores == "requested")
+    if not success:
+        assert "different core count" in receipt["error"]["message"]
 
 
 @pytest.mark.parametrize("profile", [None, "", "/controlled/wine-6.6"])

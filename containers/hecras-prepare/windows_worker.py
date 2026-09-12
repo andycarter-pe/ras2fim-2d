@@ -60,8 +60,11 @@ def write_json(path, payload):
 
 
 def run_worker(project, plan, ras_executable, ras_commander_wheel,
-               expected_ras_commander_wheel_sha256, timeout, replace_generated):
+               expected_ras_commander_wheel_sha256, timeout, replace_generated,
+               num_cores=2):
     """Prepare one plan with the public ras-commander preprocessing API."""
+    if isinstance(num_cores, bool) or not isinstance(num_cores, int) or not 1 <= num_cores <= 8:
+        raise ValueError("num_cores must be an integer from 1 to 8")
     from model_checks import preflight, normalize_inputs, validate_outputs
 
     provenance = verify_ras_commander(
@@ -90,6 +93,16 @@ def run_worker(project, plan, ras_executable, ras_commander_wheel,
     plan_path = RasPlan.get_plan_path(plan, ras_object=ras_object)
     if plan_path is None:
         raise RuntimeError("Selected plan " + plan + " could not be resolved")
+    RasPlan.set_num_cores(
+        plan_path, num_cores, ras_object=ras_object, refresh_dataframes=False
+    )
+    # set_num_cores updates existing keys; the typed 2D API also inserts a
+    # missing key in each named mesh and the existing default settings block.
+    RasPlan.set_2d_flow_options(
+        plan_path, cores=num_cores, include_default=True, ras_object=ras_object
+    )
+    if RasPlan.get_plan_value(plan_path, "UNET D2 Cores", ras_object=ras_object) != num_cores:
+        raise RuntimeError("Selected 2D plan has no effective UNET D2 Cores setting")
     GeomPreprocessor.clear_geompre_files(plan_path, ras_object=ras_object)
     RasPlan.update_run_flags(
         plan_path, geometry_preprocessor=True, ras_object=ras_object
@@ -108,6 +121,7 @@ def run_worker(project, plan, ras_executable, ras_commander_wheel,
         "success": bool(result),
         "plan": result.plan_number,
         "geometry": result.geometry_number,
+        "num_cores": num_cores,
         "tmp_hdf_path": str(result.tmp_hdf_path) if result.tmp_hdf_path else None,
         "b_file_path": str(result.b_file_path) if result.b_file_path else None,
         "x_file_path": str(result.x_file_path) if result.x_file_path else None,
@@ -134,6 +148,7 @@ def build_parser():
     parser.add_argument("--ras-commander-wheel", required=True)
     parser.add_argument("--expected-ras-commander-wheel-sha256", required=True)
     parser.add_argument("--timeout", required=True, type=int)
+    parser.add_argument("--num-cores", type=int, choices=range(1, 9), default=2)
     parser.add_argument("--result", required=True, type=Path)
     parser.add_argument("--replace-generated", action="store_true")
     return parser
@@ -150,12 +165,14 @@ def main(argv=None):
             args.expected_ras_commander_wheel_sha256,
             args.timeout,
             args.replace_generated,
+            num_cores=args.num_cores,
         )
     except Exception as exc:
         payload = {
             "success": False,
             "plan": args.plan,
             "geometry": None,
+            "num_cores": args.num_cores,
             "tmp_hdf_path": None,
             "b_file_path": None,
             "x_file_path": None,

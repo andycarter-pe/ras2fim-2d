@@ -254,7 +254,9 @@ def utc_now():
 
 
 def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
-                runtime_manifest, expected_version, runner=run_command):
+                runtime_manifest, expected_version, runner=run_command, num_cores=2):
+    if isinstance(num_cores, bool) or not isinstance(num_cores, int) or not 1 <= num_cores <= 8:
+        raise JobError("num_cores must be an integer from 1 to 8")
     plan = normalize_plan(plan)
     run_id = normalize_run_id(run_id)
     root = Path(job_root).resolve(strict=True)
@@ -286,7 +288,11 @@ def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
         "plan": plan,
         "geometry": geometry,
         "runtime": runtime["identity"],
-        "arguments": {"timeout_seconds": timeout, "replace_generated": replace_generated},
+        "arguments": {
+            "timeout_seconds": timeout,
+            "replace_generated": replace_generated,
+            "num_cores": num_cores,
+        },
         "started_at": utc_now(),
     }
 
@@ -307,6 +313,7 @@ def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
             "--ras-commander-wheel", runtime["ras_commander_wheel"],
             "--expected-ras-commander-wheel-sha256", runtime["wheel_sha"],
             "--timeout", str(timeout),
+            "--num-cores", str(num_cores),
             "--result", wine_path(result_file, environment, True, runner),
         ]
         if replace_generated:
@@ -319,6 +326,9 @@ def run_prepare(project, plan, timeout, replace_generated, run_id, job_root,
             raise JobError(str(result.get("error") or "Wine preparation worker failed"))
         if result.get("plan") != plan or result.get("geometry") != geometry:
             raise JobError("Wine worker returned a different plan or geometry")
+        worker_cores = result.get("num_cores")
+        if isinstance(worker_cores, bool) or not isinstance(worker_cores, int) or worker_cores != num_cores:
+            raise JobError("Wine worker returned a different core count")
         if result.get("timed_out") is not False:
             raise JobError("Wine preparation timed out")
         if result.get("full_result_copied") is not False:
@@ -392,6 +402,8 @@ def build_parser():
     prepare.add_argument("--project", required=True)
     prepare.add_argument("--plan", default="01")
     prepare.add_argument("--timeout", type=positive_integer, default=300)
+    prepare.add_argument("--num-cores", type=int, choices=range(1, 9), default=2,
+                         help="HEC-RAS cores; match Docker --cpus (default: 2)")
     prepare.add_argument("--run-id")
     prepare.add_argument("--replace-generated", action="store_true")
     return parser
@@ -409,6 +421,7 @@ def main(argv=None):
             Path(os.environ.get("RAS2FIM_JOB_ROOT", "/job")),
             Path(os.environ.get("RAS2FIM_RUNTIME_MANIFEST", "/runtime/wine-seed/runtime.json")),
             os.environ.get("RAS2FIM_HECRAS_VERSION", "6.6"),
+            num_cores=args.num_cores,
         )
     except (JobError, OSError, ValueError) as exc:
         print("hecras-prepare: " + str(exc), file=sys.stderr)
