@@ -1572,7 +1572,7 @@ def fn_replace_boundary_lines_in_file(file_path, list_new_boundary_lines, index)
     lines[start_index:end_index] = list_new_boundary_lines
 
     # Write the modified contents back to the file
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', newline='\r\n') as file:
         file.writelines(lines)
 # -------------------
 
@@ -1714,7 +1714,7 @@ def fn_edit_unsteady_flow_file(str_flow_fullpath, dict_flows, list_flows_int, st
         lines[hydro_int_start:hydro_int_start] = list_flow_rows
 
     # Write the modified lines back to the file
-    with open(str_flow_fullpath, "w") as file:
+    with open(str_flow_fullpath, "w", newline='\r\n') as file:
         file.writelines(lines)
 # ----------------
 

@@ -32,7 +32,7 @@ from spawn_hecras_copies_emit_02 import fn_spawn_hecras_copies
 
 if platform.system() == "Windows":
     import win32com.client
-    from stage_hecras_for_linux_v66_02b import fn_prepare_hecras_for_linux
+    from stage_hecras_for_linux_wine_02b import fn_prepare_hecras_for_linux
     from create_hec_ras_scripts_for_linux_02c import fn_hec_ras_scripts_for_linux
     
 ##from run_hecras_windows_03 import fn_run_hec_ras_models
@@ -233,9 +233,9 @@ def fn_ras2fim_2d(str_source_folder,
         
         
         if platform.system() == "Windows":
-            # Step 02b -- stage for HEC-RAS v6.6 on Windows machine
+            # Step 02b -- preprocess in parallel on the Linux Docker host
         
-            int_processes = 4 # number of HEC-RAS to run concurrently on Windows machine
+            int_processes = 4 # number of preprocessors to run on the Linux host
             flt_timeout_sec = 900 # per-project timeout in seconds
             
             fn_prepare_hecras_for_linux(str_config_file_path,

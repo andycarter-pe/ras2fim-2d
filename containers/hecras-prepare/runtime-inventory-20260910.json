@@ -1,0 +1,2960 @@
+{
+  "captured_on": "2026-09-10",
+  "common": {
+    "custom_python_scripts": [
+      {
+        "image_path": "/opt/hecras-prepare/prepare.py",
+        "repository_source": "prepare.py",
+        "sha256": "850230594f2918adfa236da6883d88d323864c287eea1bc2e877966cfa3dd904"
+      },
+      {
+        "image_path": "/opt/hecras-prepare/windows_worker.py",
+        "repository_source": "windows_worker.py",
+        "sha256": "64b14d47f6ff5b5142b84a13c6cf874d9b3c2ae88290d972489f693faa041210"
+      },
+      {
+        "image_path": "/runtime/wine-seed/prefix/drive_c/ras2fim-runtime/verify_windows_runtime.py",
+        "repository_source": "profile_provenance_check_legacy.py",
+        "role": "Unused historical 6.5-only metadata/import checker; not called by the entrypoint or job worker.",
+        "sha256": "b8860ddc34a7a569b9ad54b10bfc62edabfc462e0a4aa87f06d096653160361e"
+      },
+      {
+        "image_path": "/opt/hecras-prepare/model_checks.py",
+        "repository_source": "model_checks.py",
+        "sha256": "5f251f5d224bf84cb010ea12d0c3a7bf40a6a9a940b98bf2e78bfe8a2b71bc20"
+      }
+    ],
+    "linux_packages": [
+      {
+        "architecture": "amd64",
+        "package": "acl",
+        "version": "2.3.2-2+b1"
+      },
+      {
+        "architecture": "all",
+        "package": "adduser",
+        "version": "3.152"
+      },
+      {
+        "architecture": "amd64",
+        "package": "apt",
+        "version": "3.0.3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "base-files",
+        "version": "13.8+deb13u6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "base-passwd",
+        "version": "3.6.7"
+      },
+      {
+        "architecture": "amd64",
+        "package": "bash",
+        "version": "5.2.37-2+b9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "bsdutils",
+        "version": "1:2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "ca-certificates",
+        "version": "20250419"
+      },
+      {
+        "architecture": "amd64",
+        "package": "coreutils",
+        "version": "9.7-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "dash",
+        "version": "0.5.12-12"
+      },
+      {
+        "architecture": "all",
+        "package": "debconf",
+        "version": "1.5.91"
+      },
+      {
+        "architecture": "all",
+        "package": "debian-archive-keyring",
+        "version": "2025.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "debianutils",
+        "version": "5.23.2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "diffutils",
+        "version": "1:3.10-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "dirmngr",
+        "version": "2.4.7-21+deb13u1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "dpkg",
+        "version": "1.22.22"
+      },
+      {
+        "architecture": "amd64",
+        "package": "findutils",
+        "version": "4.10.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "fontconfig",
+        "version": "2.15.0-2.3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "fontconfig-config",
+        "version": "2.15.0-2.3"
+      },
+      {
+        "architecture": "all",
+        "package": "fonts-dejavu-core",
+        "version": "2.37-8"
+      },
+      {
+        "architecture": "all",
+        "package": "fonts-dejavu-mono",
+        "version": "2.37-8"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gcc-14-base:amd64",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "i386",
+        "package": "gcc-14-base:i386",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "all",
+        "package": "gnupg",
+        "version": "2.4.7-21+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "gnupg-l10n",
+        "version": "2.4.7-21+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gpg",
+        "version": "2.4.7-21+deb13u1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gpg-agent",
+        "version": "2.4.7-21+deb13u1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gpgconf",
+        "version": "2.4.7-21+deb13u1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gpgsm",
+        "version": "2.4.7-21+deb13u1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "grep",
+        "version": "3.11-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "gzip",
+        "version": "1.13-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "hostname",
+        "version": "3.25"
+      },
+      {
+        "architecture": "all",
+        "package": "init-system-helpers",
+        "version": "1.69~deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "iso-codes",
+        "version": "4.18.0-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libabsl20240722:amd64",
+        "version": "20240722.0-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libabsl20240722:i386",
+        "version": "20240722.0-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libacl1:amd64",
+        "version": "2.3.2-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libaom3:amd64",
+        "version": "3.12.1-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libaom3:i386",
+        "version": "3.12.1-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libapparmor1:amd64",
+        "version": "4.1.0-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libapt-pkg7.0:amd64",
+        "version": "3.0.3"
+      },
+      {
+        "architecture": "all",
+        "package": "libasound2-data",
+        "version": "1.2.14-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libasound2-plugins:amd64",
+        "version": "1.2.12-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libasound2-plugins:i386",
+        "version": "1.2.12-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libasound2t64:amd64",
+        "version": "1.2.14-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libasound2t64:i386",
+        "version": "1.2.14-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libassuan9:amd64",
+        "version": "3.0.2-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libassuan9:i386",
+        "version": "3.0.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libasyncns0:amd64",
+        "version": "0.8-6+b5"
+      },
+      {
+        "architecture": "i386",
+        "package": "libasyncns0:i386",
+        "version": "0.8-6+b5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libatomic1:amd64",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "i386",
+        "package": "libatomic1:i386",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libattr1:amd64",
+        "version": "1:2.5.2-3"
+      },
+      {
+        "architecture": "all",
+        "package": "libaudit-common",
+        "version": "1:4.0.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libaudit1:amd64",
+        "version": "1:4.0.2-2+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavahi-client3:amd64",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavahi-client3:i386",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavahi-common-data:amd64",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavahi-common-data:i386",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavahi-common3:amd64",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavahi-common3:i386",
+        "version": "0.8-16"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavcodec61:amd64",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavcodec61:i386",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavif16:amd64",
+        "version": "1.2.1-1.2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavif16:i386",
+        "version": "1.2.1-1.2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libavutil59:amd64",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libavutil59:i386",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libblkid1:amd64",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libblkid1:i386",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libbrotli1:amd64",
+        "version": "1.1.0-2+b7"
+      },
+      {
+        "architecture": "i386",
+        "package": "libbrotli1:i386",
+        "version": "1.1.0-2+b7"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libbsd0:amd64",
+        "version": "0.12.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libbz2-1.0:amd64",
+        "version": "1.0.8-6"
+      },
+      {
+        "architecture": "i386",
+        "package": "libbz2-1.0:i386",
+        "version": "1.0.8-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libc-bin",
+        "version": "2.41-12+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libc6:amd64",
+        "version": "2.41-12+deb13u3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libc6:i386",
+        "version": "2.41-12+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcairo-gobject2:amd64",
+        "version": "1.18.4-1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcairo-gobject2:i386",
+        "version": "1.18.4-1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcairo2:amd64",
+        "version": "1.18.4-1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcairo2:i386",
+        "version": "1.18.4-1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcap-ng0:amd64",
+        "version": "0.8.5-4+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcap2:amd64",
+        "version": "1:2.75-10+deb13u1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcap2:i386",
+        "version": "1:2.75-10+deb13u1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcap2-bin",
+        "version": "1:2.75-10+deb13u1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcodec2-1.2:amd64",
+        "version": "1.2.0-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcodec2-1.2:i386",
+        "version": "1.2.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcom-err2:amd64",
+        "version": "1.47.2-3+b11"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcom-err2:i386",
+        "version": "1.47.2-3+b11"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcrypt1:amd64",
+        "version": "1:4.4.38-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcrypt1:i386",
+        "version": "1:4.4.38-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcurl3t64-gnutls:amd64",
+        "version": "8.14.1-2+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcurl3t64-gnutls:i386",
+        "version": "8.14.1-2+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libcurl4t64:amd64",
+        "version": "8.14.1-2+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libcurl4t64:i386",
+        "version": "8.14.1-2+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdatrie1:amd64",
+        "version": "0.2.13-3+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdatrie1:i386",
+        "version": "0.2.13-3+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdav1d7:amd64",
+        "version": "1.5.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdav1d7:i386",
+        "version": "1.5.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdb5.3t64:amd64",
+        "version": "5.3.28+dfsg2-9"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdb5.3t64:i386",
+        "version": "5.3.28+dfsg2-9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdbus-1-3:amd64",
+        "version": "1.16.2-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdbus-1-3:i386",
+        "version": "1.16.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libde265-0:amd64",
+        "version": "1.0.15-1+deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libde265-0:i386",
+        "version": "1.0.15-1+deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdebconfclient0:amd64",
+        "version": "0.280"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdeflate0:amd64",
+        "version": "1.23-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdeflate0:i386",
+        "version": "1.23-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdrm-amdgpu1:amd64",
+        "version": "2.4.124-2"
+      },
+      {
+        "architecture": "all",
+        "package": "libdrm-common",
+        "version": "2.4.124-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdrm-intel1:amd64",
+        "version": "2.4.124-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libdrm2:amd64",
+        "version": "2.4.124-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libdrm2:i386",
+        "version": "2.4.124-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libedit2:amd64",
+        "version": "3.1-20250104-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libelf1t64:amd64",
+        "version": "0.192-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libexif12:amd64",
+        "version": "0.6.25-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libexif12:i386",
+        "version": "0.6.25-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libexpat1:amd64",
+        "version": "2.8.3-1~deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libexpat1:i386",
+        "version": "2.8.3-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libffi8:amd64",
+        "version": "3.4.8-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libffi8:i386",
+        "version": "3.4.8-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libflac14:amd64",
+        "version": "1.5.0+ds-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libflac14:i386",
+        "version": "1.5.0+ds-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libfontconfig1:amd64",
+        "version": "2.15.0-2.3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libfontconfig1:i386",
+        "version": "2.15.0-2.3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libfontenc1:amd64",
+        "version": "1:1.1.8-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libfreetype6:amd64",
+        "version": "2.13.3+dfsg-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libfreetype6:i386",
+        "version": "2.13.3+dfsg-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libfribidi0:amd64",
+        "version": "1.0.16-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libfribidi0:i386",
+        "version": "1.0.16-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgav1-1:amd64",
+        "version": "0.19.0-3+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgav1-1:i386",
+        "version": "0.19.0-3+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgbm1:amd64",
+        "version": "25.0.7-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgcc-s1:amd64",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgcc-s1:i386",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgcrypt20:amd64",
+        "version": "1.11.0-7+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgd3:amd64",
+        "version": "2.3.3-14~deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgd3:i386",
+        "version": "2.3.3-14~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgdbm-compat4t64:amd64",
+        "version": "1.24-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgdbm-compat4t64:i386",
+        "version": "1.24-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgdbm6t64:amd64",
+        "version": "1.24-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgdbm6t64:i386",
+        "version": "1.24-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgdk-pixbuf-2.0-0:amd64",
+        "version": "2.42.12+dfsg-4+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgdk-pixbuf-2.0-0:i386",
+        "version": "2.42.12+dfsg-4+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "libgdk-pixbuf2.0-common",
+        "version": "2.42.12+dfsg-4+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgl1:amd64",
+        "version": "1.7.0-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgl1-mesa-dri:amd64",
+        "version": "25.0.7-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libglib2.0-0t64:amd64",
+        "version": "2.84.4-3~deb13u3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libglib2.0-0t64:i386",
+        "version": "2.84.4-3~deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libglvnd0:amd64",
+        "version": "1.7.0-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libglx-mesa0:amd64",
+        "version": "25.0.7-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libglx0:amd64",
+        "version": "1.7.0-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgmp10:amd64",
+        "version": "2:6.3.0+dfsg-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgmp10:i386",
+        "version": "2:6.3.0+dfsg-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgnutls30t64:amd64",
+        "version": "3.8.9-3+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgnutls30t64:i386",
+        "version": "3.8.9-3+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgomp1:amd64",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgomp1:i386",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgpg-error0:amd64",
+        "version": "1.51-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgpg-error0:i386",
+        "version": "1.51-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgpgme11t64:amd64",
+        "version": "1.24.2-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgpgme11t64:i386",
+        "version": "1.24.2-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgpgmepp6t64:amd64",
+        "version": "1.24.2-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgpgmepp6t64:i386",
+        "version": "1.24.2-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgphoto2-6t64:amd64",
+        "version": "2.5.31-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgphoto2-6t64:i386",
+        "version": "2.5.31-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgphoto2-port12t64:amd64",
+        "version": "2.5.31-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgphoto2-port12t64:i386",
+        "version": "2.5.31-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgraphite2-3:amd64",
+        "version": "1.3.14-2+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgraphite2-3:i386",
+        "version": "1.3.14-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgsm1:amd64",
+        "version": "1.0.22-1+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgsm1:i386",
+        "version": "1.0.22-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgssapi-krb5-2:amd64",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgssapi-krb5-2:i386",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgstreamer-plugins-base1.0-0:amd64",
+        "version": "1.26.2-1+deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgstreamer-plugins-base1.0-0:i386",
+        "version": "1.26.2-1+deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libgstreamer1.0-0:amd64",
+        "version": "1.26.2-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libgstreamer1.0-0:i386",
+        "version": "1.26.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libharfbuzz0b:amd64",
+        "version": "10.2.0-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libharfbuzz0b:i386",
+        "version": "10.2.0-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libheif-plugin-dav1d:amd64",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libheif-plugin-dav1d:i386",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libheif-plugin-libde265:amd64",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libheif-plugin-libde265:i386",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libheif1:amd64",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libheif1:i386",
+        "version": "1.19.8-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libhogweed6t64:amd64",
+        "version": "3.10.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libhogweed6t64:i386",
+        "version": "3.10.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libhwy1t64:amd64",
+        "version": "1.2.0-2+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libhwy1t64:i386",
+        "version": "1.2.0-2+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libice6:amd64",
+        "version": "2:1.1.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libidn2-0:amd64",
+        "version": "2.3.8-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libidn2-0:i386",
+        "version": "2.3.8-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libieee1284-3t64:amd64",
+        "version": "0.2.11-14.1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libieee1284-3t64:i386",
+        "version": "0.2.11-14.1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libimagequant0:amd64",
+        "version": "2.18.0-1+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libimagequant0:i386",
+        "version": "2.18.0-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libjack-jackd2-0:amd64",
+        "version": "1.9.22~dfsg-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libjack-jackd2-0:i386",
+        "version": "1.9.22~dfsg-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libjbig0:amd64",
+        "version": "2.1-6.1+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libjbig0:i386",
+        "version": "2.1-6.1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libjpeg62-turbo:amd64",
+        "version": "1:2.1.5-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libjpeg62-turbo:i386",
+        "version": "1:2.1.5-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libjxl0.11:amd64",
+        "version": "0.11.2-0.1~deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libjxl0.11:i386",
+        "version": "0.11.2-0.1~deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libk5crypto3:amd64",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libk5crypto3:i386",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libkeyutils1:amd64",
+        "version": "1.6.3-6"
+      },
+      {
+        "architecture": "i386",
+        "package": "libkeyutils1:i386",
+        "version": "1.6.3-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libkmod2:amd64",
+        "version": "34.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libkrb5-3:amd64",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libkrb5-3:i386",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libkrb5support0:amd64",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libkrb5support0:i386",
+        "version": "1.21.3-5+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libksba8:amd64",
+        "version": "1.6.7-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liblastlog2-2:amd64",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liblcms2-2:amd64",
+        "version": "2.16-2+deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "liblcms2-2:i386",
+        "version": "2.16-2+deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libldap2:amd64",
+        "version": "2.6.10+dfsg-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libldap2:i386",
+        "version": "2.6.10+dfsg-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liblerc4:amd64",
+        "version": "4.0.0+ds-5"
+      },
+      {
+        "architecture": "i386",
+        "package": "liblerc4:i386",
+        "version": "4.0.0+ds-5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libllvm19:amd64",
+        "version": "1:19.1.7-3+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libltdl7:amd64",
+        "version": "2.5.4-4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libltdl7:i386",
+        "version": "2.5.4-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liblz4-1:amd64",
+        "version": "1.10.0-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liblzma5:amd64",
+        "version": "5.8.1-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "liblzma5:i386",
+        "version": "5.8.1-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libmd0:amd64",
+        "version": "1.1.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libmount1:amd64",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libmount1:i386",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libmp3lame0:amd64",
+        "version": "3.100-6+b3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libmp3lame0:i386",
+        "version": "3.100-6+b3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libmpg123-0t64:amd64",
+        "version": "1.32.10-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libmpg123-0t64:i386",
+        "version": "1.32.10-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libncurses6:amd64",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libncurses6:i386",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libncursesw6:amd64",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnettle8t64:amd64",
+        "version": "3.10.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnettle8t64:i386",
+        "version": "3.10.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnghttp2-14:amd64",
+        "version": "1.64.0-1.1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnghttp2-14:i386",
+        "version": "1.64.0-1.1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnghttp3-9:amd64",
+        "version": "1.8.0-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnghttp3-9:i386",
+        "version": "1.8.0-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libngtcp2-16:amd64",
+        "version": "1.11.0-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libngtcp2-16:i386",
+        "version": "1.11.0-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libngtcp2-crypto-gnutls8:amd64",
+        "version": "1.11.0-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libngtcp2-crypto-gnutls8:i386",
+        "version": "1.11.0-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnpth0t64:amd64",
+        "version": "1.8-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnspr4:amd64",
+        "version": "2:4.36-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnspr4:i386",
+        "version": "2:4.36-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnss3:amd64",
+        "version": "2:3.110-1+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnss3:i386",
+        "version": "2:3.110-1+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libnuma1:amd64",
+        "version": "2.0.19-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libnuma1:i386",
+        "version": "2.0.19-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libogg0:amd64",
+        "version": "1.3.5-3+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libogg0:i386",
+        "version": "1.3.5-3+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libopenjp2-7:amd64",
+        "version": "2.5.3-2.1~deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libopenjp2-7:i386",
+        "version": "2.5.3-2.1~deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libopus0:amd64",
+        "version": "1.5.2-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libopus0:i386",
+        "version": "1.5.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "liborc-0.4-0t64:amd64",
+        "version": "1:0.4.41-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "liborc-0.4-0t64:i386",
+        "version": "1:0.4.41-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libp11-kit0:amd64",
+        "version": "0.25.5-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libp11-kit0:i386",
+        "version": "0.25.5-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpam-modules:amd64",
+        "version": "1.7.0-5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpam-modules-bin",
+        "version": "1.7.0-5"
+      },
+      {
+        "architecture": "all",
+        "package": "libpam-runtime",
+        "version": "1.7.0-5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpam0g:amd64",
+        "version": "1.7.0-5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpango-1.0-0:amd64",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpango-1.0-0:i386",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpangocairo-1.0-0:amd64",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpangocairo-1.0-0:i386",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpangoft2-1.0-0:amd64",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpangoft2-1.0-0:i386",
+        "version": "1.56.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpcap0.8t64:amd64",
+        "version": "1.10.5-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpcap0.8t64:i386",
+        "version": "1.10.5-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpci3:amd64",
+        "version": "1:3.13.0-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpci3:i386",
+        "version": "1:3.13.0-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpciaccess0:amd64",
+        "version": "0.17-3+b3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpcre2-8-0:amd64",
+        "version": "10.46-1~deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpcre2-8-0:i386",
+        "version": "10.46-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libperl5.40:amd64",
+        "version": "5.40.1-6"
+      },
+      {
+        "architecture": "i386",
+        "package": "libperl5.40:i386",
+        "version": "5.40.1-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpixman-1-0:amd64",
+        "version": "0.44.0-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpixman-1-0:i386",
+        "version": "0.44.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpng16-16t64:amd64",
+        "version": "1.6.48-1+deb13u5"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpng16-16t64:i386",
+        "version": "1.6.48-1+deb13u5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpoppler-glib8t64:amd64",
+        "version": "25.03.0-5+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpoppler-glib8t64:i386",
+        "version": "25.03.0-5+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpoppler147:amd64",
+        "version": "25.03.0-5+deb13u4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpoppler147:i386",
+        "version": "25.03.0-5+deb13u4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libproc2-0:amd64",
+        "version": "2:4.0.4-9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpsl5t64:amd64",
+        "version": "0.21.2-1.1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpsl5t64:i386",
+        "version": "0.21.2-1.1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libpulse0:amd64",
+        "version": "17.0+dfsg1-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libpulse0:i386",
+        "version": "17.0+dfsg1-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "librav1e0.7:amd64",
+        "version": "0.7.1-9+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "librav1e0.7:i386",
+        "version": "0.7.1-9+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libreadline8t64:amd64",
+        "version": "8.2-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "librsvg2-2:amd64",
+        "version": "2.60.0+dfsg-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "librsvg2-2:i386",
+        "version": "2.60.0+dfsg-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "librtmp1:amd64",
+        "version": "2.4+20151223.gitfa8646d.1-2+b5"
+      },
+      {
+        "architecture": "i386",
+        "package": "librtmp1:i386",
+        "version": "2.4+20151223.gitfa8646d.1-2+b5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsamplerate0:amd64",
+        "version": "0.2.2-4+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsamplerate0:i386",
+        "version": "0.2.2-4+b2"
+      },
+      {
+        "architecture": "all",
+        "package": "libsane-common",
+        "version": "1.3.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsane1:amd64",
+        "version": "1.3.1-3+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsane1:i386",
+        "version": "1.3.1-3+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsasl2-2:amd64",
+        "version": "2.1.28+dfsg1-9"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsasl2-2:i386",
+        "version": "2.1.28+dfsg1-9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsasl2-modules-db:amd64",
+        "version": "2.1.28+dfsg1-9"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsasl2-modules-db:i386",
+        "version": "2.1.28+dfsg1-9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libseccomp2:amd64",
+        "version": "2.6.0-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libselinux1:amd64",
+        "version": "3.8.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libselinux1:i386",
+        "version": "3.8.1-1"
+      },
+      {
+        "architecture": "all",
+        "package": "libsemanage-common",
+        "version": "3.8.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsemanage2:amd64",
+        "version": "3.8.1-1"
+      },
+      {
+        "architecture": "all",
+        "package": "libsensors-config",
+        "version": "1:3.6.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsensors5:amd64",
+        "version": "1:3.6.2-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsensors5:i386",
+        "version": "1:3.6.2-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsepol2:amd64",
+        "version": "3.8.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsharpyuv0:amd64",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsharpyuv0:i386",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libshine3:amd64",
+        "version": "3.1.1-2+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libshine3:i386",
+        "version": "3.1.1-2+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsm6:amd64",
+        "version": "2:1.2.6-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsmartcols1:amd64",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsnappy1v5:amd64",
+        "version": "1.2.2-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsnappy1v5:i386",
+        "version": "1.2.2-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsndfile1:amd64",
+        "version": "1.2.2-2+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsndfile1:i386",
+        "version": "1.2.2-2+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "libsnmp-base",
+        "version": "5.9.4+dfsg-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsnmp40t64:amd64",
+        "version": "5.9.4+dfsg-2+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsnmp40t64:i386",
+        "version": "5.9.4+dfsg-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsoxr0:amd64",
+        "version": "0.1.3-4+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsoxr0:i386",
+        "version": "0.1.3-4+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libspeex1:amd64",
+        "version": "1.2.1-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libspeex1:i386",
+        "version": "1.2.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libspeexdsp1:amd64",
+        "version": "1.2.1-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libspeexdsp1:i386",
+        "version": "1.2.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsqlite3-0:amd64",
+        "version": "3.46.1-7+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsqlite3-0:i386",
+        "version": "3.46.1-7+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libssh2-1t64:amd64",
+        "version": "1.11.1-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libssh2-1t64:i386",
+        "version": "1.11.1-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libssl3t64:amd64",
+        "version": "3.5.7-1~deb13u2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libssl3t64:i386",
+        "version": "3.5.7-1~deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libstdc++6:amd64",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "i386",
+        "package": "libstdc++6:i386",
+        "version": "14.2.0-19"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsvtav1enc2:amd64",
+        "version": "2.3.0+dfsg-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsvtav1enc2:i386",
+        "version": "2.3.0+dfsg-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libswresample5:amd64",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libswresample5:i386",
+        "version": "7:7.1.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsystemd-shared:amd64",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libsystemd0:amd64",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libsystemd0:i386",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtasn1-6:amd64",
+        "version": "4.20.0-2+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtasn1-6:i386",
+        "version": "4.20.0-2+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "libthai-data",
+        "version": "0.1.29-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libthai0:amd64",
+        "version": "0.1.29-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libthai0:i386",
+        "version": "0.1.29-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtheoradec1:amd64",
+        "version": "1.2.0~alpha1+dfsg-6"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtheoradec1:i386",
+        "version": "1.2.0~alpha1+dfsg-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtheoraenc1:amd64",
+        "version": "1.2.0~alpha1+dfsg-6"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtheoraenc1:i386",
+        "version": "1.2.0~alpha1+dfsg-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtiff6:amd64",
+        "version": "4.7.0-3+deb13u3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtiff6:i386",
+        "version": "4.7.0-3+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtinfo6:amd64",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtinfo6:i386",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libtwolame0:amd64",
+        "version": "0.4.0-2+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libtwolame0:i386",
+        "version": "0.4.0-2+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libudev1:amd64",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libudev1:i386",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libunistring5:amd64",
+        "version": "1.3-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libunistring5:i386",
+        "version": "1.3-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libunwind8:amd64",
+        "version": "1.8.1-0.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libusb-1.0-0:amd64",
+        "version": "2:1.0.28-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libusb-1.0-0:i386",
+        "version": "2:1.0.28-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libuuid1:amd64",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libv4l-0t64:amd64",
+        "version": "1.30.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libv4l-0t64:i386",
+        "version": "1.30.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libv4lconvert0t64:amd64",
+        "version": "1.30.1-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libv4lconvert0t64:i386",
+        "version": "1.30.1-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libva-drm2:amd64",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libva-drm2:i386",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libva-x11-2:amd64",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libva-x11-2:i386",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libva2:amd64",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libva2:i386",
+        "version": "2.22.0-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvdpau1:amd64",
+        "version": "1.5-3+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libvdpau1:i386",
+        "version": "1.5-3+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvorbis0a:amd64",
+        "version": "1.3.7-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libvorbis0a:i386",
+        "version": "1.3.7-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvorbisenc2:amd64",
+        "version": "1.3.7-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libvorbisenc2:i386",
+        "version": "1.3.7-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvpl2",
+        "version": "1:2.14.0-1+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvpx9:amd64",
+        "version": "1.15.0-2.1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libvpx9:i386",
+        "version": "1.15.0-2.1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libvulkan1:amd64",
+        "version": "1.4.309.0-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwayland-client0:amd64",
+        "version": "1.23.1-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libwayland-client0:i386",
+        "version": "1.23.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwayland-egl1:amd64",
+        "version": "1.23.1-3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libwayland-egl1:i386",
+        "version": "1.23.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwayland-server0:amd64",
+        "version": "1.23.1-3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwebp7:amd64",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libwebp7:i386",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwebpmux3:amd64",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libwebpmux3:i386",
+        "version": "1.5.0-0.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libwrap0:amd64",
+        "version": "7.6.q-36"
+      },
+      {
+        "architecture": "i386",
+        "package": "libwrap0:i386",
+        "version": "7.6.q-36"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libx11-6:amd64",
+        "version": "2:1.8.12-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libx11-6:i386",
+        "version": "2:1.8.12-1"
+      },
+      {
+        "architecture": "all",
+        "package": "libx11-data",
+        "version": "2:1.8.12-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libx11-xcb1:amd64",
+        "version": "2:1.8.12-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libx11-xcb1:i386",
+        "version": "2:1.8.12-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libx264-164:amd64",
+        "version": "2:0.164.3108+git31e19f9-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libx264-164:i386",
+        "version": "2:0.164.3108+git31e19f9-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libx265-215:amd64",
+        "version": "4.1-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libx265-215:i386",
+        "version": "4.1-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxau6:amd64",
+        "version": "1:1.0.11-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxau6:i386",
+        "version": "1:1.0.11-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxaw7:amd64",
+        "version": "2:1.0.16-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-dri3-0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxcb-dri3-0:i386",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-glx0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-present0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-randr0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-render0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxcb-render0:i386",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-shm0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxcb-shm0:i386",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-sync1:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb-xfixes0:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxcb1:amd64",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxcb1:i386",
+        "version": "1.17.0-2+b1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxdmcp6:amd64",
+        "version": "1:1.1.5-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxdmcp6:i386",
+        "version": "1:1.1.5-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxext6:amd64",
+        "version": "2:1.3.4-1+b3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxext6:i386",
+        "version": "2:1.3.4-1+b3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxfixes3:amd64",
+        "version": "1:6.0.0-2+b4"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxfixes3:i386",
+        "version": "1:6.0.0-2+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxfont2:amd64",
+        "version": "1:2.0.6-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxkbcommon0:amd64",
+        "version": "1.7.0-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxkbcommon0:i386",
+        "version": "1.7.0-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxkbfile1:amd64",
+        "version": "1:1.1.0-1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxkbregistry0:amd64",
+        "version": "1.7.0-2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxkbregistry0:i386",
+        "version": "1.7.0-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxml2:amd64",
+        "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxml2:i386",
+        "version": "2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxmu6:amd64",
+        "version": "2:1.1.3-3+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxmuu1:amd64",
+        "version": "2:1.1.3-3+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxpm4:amd64",
+        "version": "1:3.5.17-1+deb13u1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxpm4:i386",
+        "version": "1:3.5.17-1+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxrandr2:amd64",
+        "version": "2:1.5.4-1+b3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxrender1:amd64",
+        "version": "1:0.9.12-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxrender1:i386",
+        "version": "1:0.9.12-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxshmfence1:amd64",
+        "version": "1.3.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxt6t64:amd64",
+        "version": "1:1.2.1-1.2+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxvidcore4:amd64",
+        "version": "2:1.3.7-1+b2"
+      },
+      {
+        "architecture": "i386",
+        "package": "libxvidcore4:i386",
+        "version": "2:1.3.7-1+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxxf86vm1:amd64",
+        "version": "1:1.1.4-1+b4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libxxhash0:amd64",
+        "version": "0.8.3-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libyuv0:amd64",
+        "version": "0.0.1904.20250204-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libyuv0:i386",
+        "version": "0.0.1904.20250204-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libz3-4:amd64",
+        "version": "4.13.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libzstd1:amd64",
+        "version": "1.5.7+dfsg-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libzstd1:i386",
+        "version": "1.5.7+dfsg-1"
+      },
+      {
+        "architecture": "all",
+        "package": "libzvbi-common",
+        "version": "0.2.44-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "libzvbi0t64:amd64",
+        "version": "0.2.44-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "libzvbi0t64:i386",
+        "version": "0.2.44-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "login",
+        "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "login.defs",
+        "version": "1:4.17.4-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "mawk",
+        "version": "1.3.4.20250131-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "mesa-libgallium:amd64",
+        "version": "25.0.7-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "mount",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "all",
+        "package": "ncurses-base",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "ncurses-bin",
+        "version": "6.5+20250216-2"
+      },
+      {
+        "architecture": "all",
+        "package": "netbase",
+        "version": "6.5"
+      },
+      {
+        "architecture": "amd64",
+        "package": "ocl-icd-libopencl1:amd64",
+        "version": "2.3.3-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "ocl-icd-libopencl1:i386",
+        "version": "2.3.3-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "openssl",
+        "version": "3.5.7-1~deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "openssl-provider-legacy",
+        "version": "3.5.7-1~deb13u2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "passwd",
+        "version": "1:4.17.4-2"
+      },
+      {
+        "architecture": "all",
+        "package": "pci.ids",
+        "version": "0.0~2025.06.09-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "perl-base",
+        "version": "5.40.1-6"
+      },
+      {
+        "architecture": "all",
+        "package": "perl-modules-5.40",
+        "version": "5.40.1-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "pinentry-curses",
+        "version": "1.3.1-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "procps",
+        "version": "2:4.0.4-9"
+      },
+      {
+        "architecture": "all",
+        "package": "readline-common",
+        "version": "8.2-6"
+      },
+      {
+        "architecture": "amd64",
+        "package": "sed",
+        "version": "4.9-2+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "shared-mime-info",
+        "version": "2.4-5+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "sqv",
+        "version": "1.3.0-3+b2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "systemd",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "sysvinit-utils",
+        "version": "3.14-4"
+      },
+      {
+        "architecture": "amd64",
+        "package": "tar",
+        "version": "1.35+dfsg-3.1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "tini",
+        "version": "0.19.0-3+b7"
+      },
+      {
+        "architecture": "all",
+        "package": "tzdata",
+        "version": "2026b-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "udev",
+        "version": "257.13-1~deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "util-linux",
+        "version": "2.41.5-0+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "wget",
+        "version": "1.25.0-2"
+      },
+      {
+        "architecture": "amd64",
+        "package": "wine-stable",
+        "version": "11.0.0.0~trixie-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "wine-stable-amd64",
+        "version": "11.0.0.0~trixie-1"
+      },
+      {
+        "architecture": "i386",
+        "package": "wine-stable-i386:i386",
+        "version": "11.0.0.0~trixie-1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "winehq-stable",
+        "version": "11.0.0.0~trixie-1"
+      },
+      {
+        "architecture": "all",
+        "package": "x11-common",
+        "version": "1:7.7+24+deb13u1"
+      },
+      {
+        "architecture": "amd64",
+        "package": "x11-xkb-utils",
+        "version": "7.7+9"
+      },
+      {
+        "architecture": "amd64",
+        "package": "xauth",
+        "version": "1:1.1.2-1.1"
+      },
+      {
+        "architecture": "all",
+        "package": "xkb-data",
+        "version": "2.42-1"
+      },
+      {
+        "architecture": "all",
+        "package": "xserver-common",
+        "version": "2:21.1.16-1.3+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "xvfb",
+        "version": "2:21.1.16-1.3+deb13u3"
+      },
+      {
+        "architecture": "amd64",
+        "package": "zlib1g:amd64",
+        "version": "1:1.3.dfsg+really1.3.1-1+b1"
+      },
+      {
+        "architecture": "i386",
+        "package": "zlib1g:i386",
+        "version": "1:1.3.dfsg+really1.3.1-1+b1"
+      }
+    ],
+    "linux_python": {
+      "distributions": [
+        {
+          "name": "pip",
+          "version": "26.2.1"
+        }
+      ],
+      "version": "3.13.15"
+    },
+    "python_distributions": [
+      {
+        "name": "affine",
+        "version": "3.0.0"
+      },
+      {
+        "name": "attrs",
+        "version": "26.1.0"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.7.22"
+      },
+      {
+        "name": "cffi",
+        "version": "2.1.1"
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.1"
+      },
+      {
+        "name": "click",
+        "version": "8.4.2"
+      },
+      {
+        "name": "click-plugins",
+        "version": "1.1.1.2"
+      },
+      {
+        "name": "cligj",
+        "version": "0.7.2"
+      },
+      {
+        "name": "clr_loader",
+        "version": "0.2.10"
+      },
+      {
+        "name": "colorama",
+        "version": "0.4.6"
+      },
+      {
+        "name": "contourpy",
+        "version": "1.3.3"
+      },
+      {
+        "name": "cycler",
+        "version": "0.12.1"
+      },
+      {
+        "name": "fonttools",
+        "version": "4.63.0"
+      },
+      {
+        "name": "fsspec",
+        "version": "2026.7.0"
+      },
+      {
+        "name": "geopandas",
+        "version": "1.1.4"
+      },
+      {
+        "name": "h5py",
+        "version": "3.16.0"
+      },
+      {
+        "name": "hms-commander",
+        "version": "0.3.1"
+      },
+      {
+        "name": "idna",
+        "version": "3.19"
+      },
+      {
+        "name": "kiwisolver",
+        "version": "1.5.0"
+      },
+      {
+        "name": "matplotlib",
+        "version": "3.11.1"
+      },
+      {
+        "name": "numpy",
+        "version": "2.4.6"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3"
+      },
+      {
+        "name": "pandas",
+        "version": "3.0.5"
+      },
+      {
+        "name": "pathlib",
+        "version": "1.0.1"
+      },
+      {
+        "name": "pefile",
+        "version": "2024.8.26"
+      },
+      {
+        "name": "pillow",
+        "version": "12.3.0"
+      },
+      {
+        "name": "pip",
+        "version": "24.0"
+      },
+      {
+        "name": "psutil",
+        "version": "7.2.2"
+      },
+      {
+        "name": "pycparser",
+        "version": "3.0"
+      },
+      {
+        "name": "pyogrio",
+        "version": "0.13.0"
+      },
+      {
+        "name": "pyparsing",
+        "version": "3.3.2"
+      },
+      {
+        "name": "pyproj",
+        "version": "3.7.2"
+      },
+      {
+        "name": "python-dateutil",
+        "version": "2.9.0.post0"
+      },
+      {
+        "name": "pythonnet",
+        "version": "3.0.5"
+      },
+      {
+        "name": "pywin32",
+        "version": "312"
+      },
+      {
+        "name": "ras-commander",
+        "version": "0.99.2"
+      },
+      {
+        "name": "rasterio",
+        "version": "1.4.4"
+      },
+      {
+        "name": "rasterstats",
+        "version": "0.21.0"
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2"
+      },
+      {
+        "name": "rtree",
+        "version": "1.4.1"
+      },
+      {
+        "name": "scipy",
+        "version": "1.17.1"
+      },
+      {
+        "name": "setuptools",
+        "version": "65.5.0"
+      },
+      {
+        "name": "shapely",
+        "version": "2.1.2"
+      },
+      {
+        "name": "simplejson",
+        "version": "4.1.1"
+      },
+      {
+        "name": "six",
+        "version": "1.17.0"
+      },
+      {
+        "name": "tqdm",
+        "version": "4.70.0"
+      },
+      {
+        "name": "tzdata",
+        "version": "2026.3"
+      },
+      {
+        "name": "urllib3",
+        "version": "2.7.0"
+      },
+      {
+        "name": "xarray",
+        "version": "2026.7.0"
+      }
+    ],
+    "windows_registered_components": [
+      {
+        "display_name": "Microsoft .NET Framework 4.8",
+        "display_version": "4.8.03761"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2010  x64 Redistributable - 10.0.40219",
+        "display_version": "10.0.40219"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2010  x86 Redistributable - 10.0.40219",
+        "display_version": "10.0.40219"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 Redistributable (x64) - 12.0.30501",
+        "display_version": "12.0.30501.0"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 Redistributable (x86) - 12.0.30501",
+        "display_version": "12.0.30501.0"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 x64 Additional Runtime - 12.0.21005",
+        "display_version": "12.0.21005"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 x64 Minimum Runtime - 12.0.21005",
+        "display_version": "12.0.21005"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 x86 Additional Runtime - 12.0.21005",
+        "display_version": "12.0.21005"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2013 x86 Minimum Runtime - 12.0.21005",
+        "display_version": "12.0.21005"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.24.28127",
+        "display_version": "14.24.28127.4"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2015-2019 Redistributable (x86) - 14.24.28127",
+        "display_version": "14.24.28127.4"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2019 X64 Additional Runtime - 14.24.28127",
+        "display_version": "14.24.28127"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2019 X64 Minimum Runtime - 14.24.28127",
+        "display_version": "14.24.28127"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2019 X86 Additional Runtime - 14.24.28127",
+        "display_version": "14.24.28127"
+      },
+      {
+        "display_name": "Microsoft Visual C++ 2019 X86 Minimum Runtime - 14.24.28127",
+        "display_version": "14.24.28127"
+      },
+      {
+        "display_name": "Python 3.11.9 (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Add to Path (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Core Interpreter (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Development Libraries (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Executables (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Standard Library (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Tcl/Tk Support (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 Utility Scripts (64-bit)",
+        "display_version": "3.11.9150.0"
+      },
+      {
+        "display_name": "Python 3.11.9 pip Bootstrap (64-bit)",
+        "display_version": "3.11.9150.0"
+      }
+    ],
+    "wine_drive_links": [
+      {
+        "path": "prefix/dosdevices/c:",
+        "target": "../drive_c"
+      },
+      {
+        "path": "prefix/dosdevices/z:",
+        "target": "/"
+      }
+    ],
+    "wine_initialization_history": [
+      "remove_mono internal",
+      "remove_mono internal",
+      "remove_mono internal",
+      "winxp",
+      "dotnet40",
+      "dotnet48",
+      "gdiplus",
+      "andale",
+      "arial",
+      "comicsans",
+      "courier",
+      "georgia",
+      "impact",
+      "times",
+      "trebuchet",
+      "verdana",
+      "webdings",
+      "corefonts",
+      "win10"
+    ]
+  },
+  "purpose": "Observed release contents; not a minimal dependency or installation lock file.",
+  "sources": {
+    "linux_packages": "dpkg-query inside each image at the recorded digest",
+    "linux_python": "Python runtime and importlib.metadata inside each image",
+    "windows_packages": "Installed metadata and registry records in each matching external release profile",
+    "wine_history": "Retained winetricks.log, an installation history rather than an executable recipe"
+  },
+  "versions": {
+    "6.5": {
+      "hec_program_directories": [
+        "6.5"
+      ],
+      "image": "rascommander/hec-ras-wine-precompute_6.5:v4",
+      "image_digest": "sha256:50622b26c2c210c9034a38500aa8048e84c129dc0fbf2aa348fbc3c1e368c597",
+      "runtime_manifest_sha256": "84389aa0401ee91e6cd1b77cbeeebe86c0f46d976f4e500c4d94c0c5526e5b2c"
+    },
+    "6.6": {
+      "hec_program_directories": [
+        "6.6"
+      ],
+      "image": "rascommander/hec-ras-wine-precompute_6.6:v4",
+      "image_digest": "sha256:b84b1cce0c73b8422c432a11167587a79a2bc2588b7a5d54904275dcf7af7e4a",
+      "runtime_manifest_sha256": "2a425f748cc3f176d3c4a85ab2c5b1466fed2192b842006dcde30aa5628399b8"
+    },
+    "7.0.1": {
+      "hec_program_directories": [
+        "7.0.1"
+      ],
+      "image": "rascommander/hec-ras-wine-precompute_7.0.1:v4",
+      "image_digest": "sha256:05bd9a0a272381857e0267734fa8ff287659535181ed4ce0c8e259642b65840d",
+      "runtime_manifest_sha256": "cf832d8b3a5e27f7e1093005c2252f3c0ed83d582a9b206c36fdb4db75bf85e7"
+    }
+  },
+  "runtime_details_original_capture": "2026-09-09; runtime layers retained unchanged"
+}
