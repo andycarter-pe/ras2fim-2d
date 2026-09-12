@@ -1,5 +1,17 @@
 # Agent operating instructions
 
+## All-version TCU authorization
+
+On 2026-09-11, the user explicitly authorized accepting the HEC-RAS Terms and
+Conditions for Use for all versions, including legacy releases used to
+qualify ras-commander. This covers controlled CLB runtime profiles and
+qualification hosts, including explicit `RasTcu.accept()` calls for selected
+installed versions. Retain version, runtime identity, acceptance method and
+before/after status outside Git. Record API registry acceptance accurately;
+do not describe it as a vendor GUI interaction. Preserve original profiles
+and unrelated registry state. This does not expand the published image
+versions beyond the matching releases authorized below.
+
 ## HEC-RAS runtime profiles
 
 When the official HEC-RAS installer or the installed application's first launch
