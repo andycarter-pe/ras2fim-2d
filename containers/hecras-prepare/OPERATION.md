@@ -1,40 +1,32 @@
 # What happens inside the HEC-RAS preprocessing container
 
 [Installed code and GitHub source](INSTALLED-CODE.md) lists the packaged scripts,
-links the current container source snapshot and public library references.
+links the controller source and exact installed library source.
 
-Prepared for Andy's review. CLB Engineering Corporation, September 10, 2026.
+Prepared for Andy's review. CLB Engineering Corporation, September 12, 2026.
 
 The container provides Wine so [ras-commander][rc] can call installed Windows
 HEC-RAS on Linux. It takes an existing model, prepares inputs for a separate
 calculation stage, and leaves those files in the host's mounted working folder.
 
-The bundled 6.5, 6.6 and 7.0.1 images are published with installed runtimes
-and saved TCU acceptance. The operating sequence is the same
-for each selected runtime. The path example below uses 6.5; other HEC-RAS
-releases use their matching installation directories.
+**Qualification status:** All three matching versions passed the full 266-hour Linux sample and the one-hour Windows Docker Desktop notebook, using two CPUs per container. Linux results contained 267 output times; Windows results contained two, with 6,548 finite water-surface values at every time. Live progress, resume and sequential batch checks passed on both hosts; the six Linux Wine LF/CRLF cases also passed. The images are published on Docker Hub, and anonymous pulls verified all six matching payloads.
 
-The matching [7.0.1 native Linux image](https://hub.docker.com/r/rascommander/hec-ras-linux-unsteady_7.0.1) completes the unsteady
+The images include installed runtimes and saved TCU acceptance. The operating sequence is the same for each selected runtime. The path example below uses 6.5; other HEC-RAS versions use their matching installation directories.
+
+The matching [native Linux image](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/README.md) completes the unsteady
 calculation after preprocessing. The [Python operating guide](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/docs/user-guide/container-execution.md) and
 [notebook](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/examples/512_docker_precompute_and_linux_compute.ipynb) show both stages through [ras-commander][rc].
-See the [7.0.1 release record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-7.0.1-20260911.md) for full Linux and Windows Docker
-Desktop qualification.
+See the [current release record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-CURRENT.md) for full 266-hour Linux and one-hour Windows Docker Desktop qualification.
 
 ## Models created on Windows or Linux
 
-Pull the current image before testing (`docker pull rascommander/hec-ras-wine-precompute_6.5:v4`, or the matching 6.6 or 7.0.1 image). Use a disposable model copy and mount its referenced terrain and projection
+Pull the matching current image before running. Use a disposable model copy and mount its referenced terrain and projection
 folders. Relative paths are resolved inside the container: `..\source_terrain`
 and `..\projection` must lead to mounted folders. Mounting a model folder alone
 does not expose its siblings. The terrain HDF must also have access to its
 referenced TIFF files.
 
-Use `--user root` for a command that works with both Docker Desktop and
-Ubuntu WSL Windows-drive mounts. Docker Desktop 4.90 also passed the default
-UID-1000 CRLF checks for HEC-RAS 6.5 and 6.6. Ubuntu's direct `/mnt/c` mount
-produced a hidden HEC-RAS `Run-time error '75': Path/File access error` under
-UID 1000; root passed there. Use a disposable model folder, since a failure
-after HEC-RAS starts can leave partial outputs. See the
-[host qualification results](RELEASE-VERIFICATION.md).
+Use `--user root` for the qualified Windows Docker Desktop route. The tests used a host folder containing spaces and read-only dependency mounts.
 
 Before HEC-RAS starts, [model_checks.py][build-checks] reads the selected plan, geometry and
 unsteady flow inputs, checks the existing 2D geometry HDF, and verifies the
@@ -83,6 +75,7 @@ At startup the wrapper copies the prepared prefix into the job's private
 scratch directory and sets `WINEPREFIX` to that copy. Wine can update its
 registry and temporary state in that private copy. The worker reads the
 installed template when making the copy; normal job updates use the copy.
+The seed is root-owned: UID 1000 cannot modify it, while root could.
 Windows Python is `C:\Python311\python.exe`; Xvfb supplies a virtual screen
 for the Windows application. No interactive desktop is needed for a prepared job.
 
@@ -115,7 +108,7 @@ flowchart LR
 | Referenced terrain/projection mounts | Usually read-only; their mounted paths must match the model's references. |
 | `/runtime/wine-seed` | Installed template included in the image; the worker copies it for each job. |
 | `/run/ras-job/<run-id>` | Private Wine prefix and intermediate worker files in the container's writable layer. |
-| `/tmp` | Temporary storage in the container's writable layer for the command below. |
+| `/tmp` | Temporary storage in the container's writable layer for the standard API/CLI launch. |
 
 The bind-mount `src` path belongs to the machine running the Docker daemon.
 When Docker is started over SSH, use that Linux host's path. A Windows
@@ -132,9 +125,9 @@ container and its writable layer; the bind-mounted model folder remains.
 
 The Windows worker uses these [ras-commander][rc] APIs. Every library function
 shown in the diagram has a source link in the tables below. Links point to
-public upstream references; the arguments and behavior described here were
-checked against the installed 0.99.2 build. Its retained build identity is
-recorded in the reconstruction section.
+the exact installed source at public commit
+`9e4217713e954236b0c16023e1815c6f2b7a5309`; all 239 wheel package files
+match that commit after normalizing line endings.
 
 ```mermaid
 sequenceDiagram
@@ -154,7 +147,7 @@ sequenceDiagram
     W->>C: init_ras_project(..., accept_tcu=True)
     C->>C: RasTcu.status() and RasTcu.accept() if needed
     W->>C: RasPlan.get_plan_path(...)
-    W->>C: RasPlan.set_num_cores(..., num_cores)
+    W->>C: RasPlan.set_num_cores(..., num_cores, refresh_dataframes=False)
     W->>C: RasPlan.set_2d_flow_options(..., cores=num_cores, include_default=True)
     W->>C: RasPlan.get_plan_value(..., "UNET D2 Cores")
     W->>C: GeomPreprocessor.clear_geompre_files(...)
@@ -203,8 +196,7 @@ path and translated worker arguments. Inside [RasPreprocess.preprocess_plan()][p
 a Windows Python subprocess launches the full executable path as
 `"Ras.exe" -c "<project.prj>" "<project.p01>"` with `shell=False`.
 
-The CPU calls above are part of this source checkout and require a rebuilt,
-qualified image before publication. The controller and Windows worker accept
+The CPU calls above passed Linux and Windows qualification with two cores. The controller and Windows worker accept
 `--num-cores` from 1 to 8, defaulting to 2. Pass the same number to Docker
 `--cpus` to match its CPU-time limit to the plan's solver setting. The controller
 passes the count to the worker and records `arguments.num_cores` in both success
@@ -247,41 +239,43 @@ later native HEC-RAS 6.5 engine require their own checks.
 
 ## Run configuration and review sources
 
-The supplied launcher runs as UID 1000 with two CPUs, 6 GiB RAM, networking
-disabled, a read-only root, no added Linux capabilities, and no privilege
-escalation. The qualified host supplies `/dev/ntsync` for Wine synchronization.
-Hosts without it need separate qualification.
+The host chooses the container user, memory and filesystem limits. The
+qualified Python API route uses root and two CPUs; the image itself defaults
+to UID 1000. The Linux command in the README also shows a read-only root,
+memory limits and optional host Wine synchronization support. Windows Docker
+Desktop qualification did not pass a `/dev/ntsync` device.
 
 [Run instructions](README.md) provide the complete Docker command.
 [How to Re-Create this Container](PREPARATION.md) covers installation, packaging,
 software inventory, and build verification separately from this operating guide.
-The [release verification record](RELEASE-VERIFICATION.md) contains the test evidence.
+The [current runtime inventory](runtime-inventory-current.json) lists installed packages, source identities and runtime paths for all three versions.
+The [release verification record](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-CURRENT.md) contains the test evidence.
 
 | Review file | Responsibility |
 |---|---|
-| [Dockerfile](Dockerfile) | Linux software, runtime packaging, user, and entrypoint. |
-| [prepare.py](prepare.py) | Model request, runtime copy, worker launch, output checks, receipt. |
-| [windows_worker.py](windows_worker.py) | The direct [ras-commander][rc] calls listed above. |
+| [Dockerfile](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/Dockerfile) | Linux software, runtime packaging, user, and entrypoint. |
+| [prepare.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/prepare.py) | Model request, runtime copy, worker launch, output checks, receipt. |
+| [windows_worker.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/windows_worker.py) | The direct [ras-commander][rc] calls listed above. |
 | [Step 2b controller](../../src/stage_hecras_for_linux_wine_02b.py) | Host mounts, Docker launch, batch completion, staging. |
 | [Mermaid source](ras-commander-call-sequence.mmd) | Editable API sequence diagram. |
 
 [rc]: https://rascommander.info/ras/
 [rc-github]: https://github.com/gpt-cmdr/ras-commander
-[ras-prj]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L125
-[init]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L2462
-[plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L787
-[clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/geom/GeomPreprocessor.py#L1152
-[run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L1394
-[plan-cores]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
-[plan-2d]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
-[plan-value]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py
-[preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L97
-[tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L270
-[tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L449
-[bco]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L25
-[logging]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L95
-[monitor]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L144
-[terminate]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L964
-[result]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/ComputeResults.py#L185
+[ras-prj]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPrj.py
+[init]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPrj.py
+[plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/geom/GeomPreprocessor.py
+[run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[plan-cores]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[plan-2d]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[plan-value]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPreprocess.py
+[tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasTcu.py
+[tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasTcu.py
+[bco]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[logging]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[monitor]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[terminate]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPreprocess.py
+[result]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/ComputeResults.py
 
-[build-checks]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py
+[build-checks]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/model_checks.py

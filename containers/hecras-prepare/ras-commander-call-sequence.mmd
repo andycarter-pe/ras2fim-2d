@@ -10,12 +10,12 @@ sequenceDiagram
     end
     L->>L: Select runtime and copy private WINEPREFIX
     L->>W: xvfb-run + wine + Windows Python
-    W->>W: Check dependencies and normalize input text to CRLF
+    W->>W: Check model dependencies and normalize inputs to CRLF
     W->>C: RasPrj()
     W->>C: init_ras_project(..., accept_tcu=True)
     C->>C: RasTcu.status() and RasTcu.accept() if needed
     W->>C: RasPlan.get_plan_path(...)
-    W->>C: RasPlan.set_num_cores(..., num_cores)
+    W->>C: RasPlan.set_num_cores(..., num_cores, refresh_dataframes=False)
     W->>C: RasPlan.set_2d_flow_options(..., cores=num_cores, include_default=True)
     W->>C: RasPlan.get_plan_value(..., "UNET D2 Cores")
     W->>C: GeomPreprocessor.clear_geompre_files(...)
@@ -28,6 +28,6 @@ sequenceDiagram
     Note over C,H: BCO signal or owned unsteady process + fresh files
     C->>H: RasPreprocess._terminate_process_tree(process) if running
     C-->>W: PreprocessResult
-    W->>W: Validate both HDF files retain 2D mesh and hydraulic tables
+    W->>W: Validate 2D mesh and hydraulic tables in both HDF files
     W-->>L: worker-result.json
     L->>Host: Confirm output files and write prepare.json through mount

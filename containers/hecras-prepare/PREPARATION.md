@@ -1,9 +1,9 @@
 # How to Re-Create this Container
 
 [Installed code and GitHub source](INSTALLED-CODE.md) lists the packaged scripts,
-links the current container source snapshot and public library references.
+links the controller source and exact installed library source.
 
-Companion to [the operating guide](OPERATION.md) and [release verification](RELEASE-VERIFICATION.md).
+Companion to [the operating guide](OPERATION.md) and [release verification](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-CURRENT.md).
 
 
 This section is for rebuilding the image. Routine users can start with the
@@ -17,23 +17,25 @@ remaining work needed for that fully independent reconstruction.
 ### 1. Gather the build inputs
 
 Use the [GitHub source snapshot][build-inputs] containing these files under
-`containers/hecras-prepare/`. The source links point to the public PR branch. External inputs link to their example or layout documentation.
+`containers/hecras-prepare/`. Source links are pinned to controller commit `dc60b219091e85bcb4564eca45313475c39ce58a`. External inputs link to their example or layout documentation.
 
 | Input | Purpose |
 |---|---|
 | [Dockerfile][build-dockerfile] | Linux tools, user 1000, bundled Wine profile, and entrypoint. |
-| [model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py) | Checks dependencies, normalizes input line endings and validates HDF content. |
+| [model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/model_checks.py) | Checks dependencies, normalizes input line endings and validates HDF content. |
 | [prepare.py][build-controller] | Linux job controller, private runtime setup, worker launch, and receipts. |
 | [windows_worker.py][build-worker] | Calls the linked [ras-commander][rc] APIs under Wine. |
 | [bundle_profile.py][build-exporter] | Exports a prepared runtime into the external build context. |
 | External [runtime.json][build-manifest] and [prefix/][build-inputs] | Installed HEC-RAS 6.5 and dependencies. Links show the manifest example and layout; actual runtime contents stay outside Git. |
-| Retained [ras_commander-0.99.2-py3-none-any.whl][build-inputs] | External wheel from build `9e4217713e954236b0c16023e1815c6f2b7a5309`; the link documents this input, not a wheel download. |
+| Retained [ras_commander-0.99.2-py3-none-any.whl][installed-package] | External wheel from build `9e4217713e954236b0c16023e1815c6f2b7a5309`; the link opens its exact package source, not a wheel download. |
 
 The base is `python:3.13.15-slim-trixie` pinned by its Dockerfile digest. The
 Dockerfile also pins Wine, Xvfb, xauth, procps and tini. Windows package versions
-are recorded in the inventory below. The public API links are reference
-documentation; rebuilding the exact installed Python package requires the
-retained wheel/build source, not an arbitrary current upstream checkout.
+are recorded in the inventory below. API links identify the exact installed
+[package source](https://github.com/gpt-cmdr/ras-commander/tree/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander). All 239 wheel package files match commit
+`9e4217713e954236b0c16023e1815c6f2b7a5309` after normalizing line endings. Retain the exact
+wheel to reproduce its packaging metadata. The original build did not record
+working-tree cleanliness; this does not change the verified package-source match.
 
 ### 2. Prepare or recover the installed Wine profile
 
@@ -99,6 +101,7 @@ docker buildx build --load --platform linux/amd64 \
   --build-arg HEC_RAS_VERSION=6.5 \
   --build-arg RAS_COMMANDER_COMMIT=9e4217713e954236b0c16023e1815c6f2b7a5309 \
   --build-arg RAS_COMMANDER_WHEEL_SHA256=dc0c2f9baa9db66afee01e34eb00d7a04f53e7b82c3340c786b2e9aef1795932 \
+  --label org.opencontainers.image.revision=dc60b219091e85bcb4564eca45313475c39ce58a \
   --tag local/hecras-6.5:review \
   --file containers/hecras-prepare/Dockerfile .
 ```
@@ -120,7 +123,7 @@ bash containers/hecras-prepare/verify_bundled_runtime.sh \
   local/hecras-6.5:review 6.5 /scratch/hecras-audit-6.5-001
 ```
 
-Then use the [run command](README.md#run) with `local/hecras-6.5:review` and a
+Then use the [run command](README.md#run-on-a-linux-filesystem) with `local/hecras-6.5:review`, `--pull never`, and a
 disposable validation model. Require the expected three output files, a successful
 receipt, no timeout, and no copied full-simulation result. Test with networking
 disabled and no external runtime mount. Retain the build log, installed-software
@@ -260,7 +263,7 @@ These registration records describe the prepared profiles and can include instal
 | Python 3.11.9 Utility Scripts (64-bit) | `3.11.9150.0` |
 | Python 3.11.9 pip Bootstrap (64-bit) | `3.11.9150.0` |
 
-The [complete recorded inventory](runtime-inventory-20260910.json) includes all
+The [complete recorded inventory](runtime-inventory-current.json) includes all
 Linux packages and Windows dependencies, custom code identities, and runtime settings.
 
 ### Custom code retained in the runtime
@@ -268,40 +271,40 @@ Linux packages and Windows dependencies, custom code identities, and runtime set
 `prepare.py` and `windows_worker.py` are installed at `/opt/hecras-prepare/`.
 An unused preparation helper remains at
 `C:\ras2fim-runtime\verify_windows_runtime.py`; its exact source is
-[profile_provenance_check_legacy.py](profile_provenance_check_legacy.py).
+[profile_provenance_check_legacy.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/profile_provenance_check_legacy.py).
 It assumes HEC-RAS 6.5 and is not called by normal jobs. Use the repository's
-[verify_windows_runtime.py](verify_windows_runtime.py), launched by
+[verify_windows_runtime.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/verify_windows_runtime.py), launched by
 [verify_bundled_runtime.sh](verify_bundled_runtime.sh), for current three-version
 qualification. Installer and run evidence locations are in
-[release verification](RELEASE-VERIFICATION.md).
+[release verification](https://github.com/gpt-cmdr/ras-commander/blob/codex/container-precompute-linux/containers/hecras-unsteady/RELEASE-CURRENT.md).
 
 [rc]: https://rascommander.info/ras/
 [rc-github]: https://github.com/gpt-cmdr/ras-commander
-[ras-prj]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L125
-[init]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPrj.py#L2462
-[plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L787
-[clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/geom/GeomPreprocessor.py#L1152
-[run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPlan.py#L1394
-[preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L97
-[tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L270
-[tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasTcu.py#L449
-[bco]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L25
-[logging]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L95
-[monitor]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasBco.py#L144
-[terminate]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/RasPreprocess.py#L964
-[result]: https://github.com/gpt-cmdr/ras-commander/blob/bab6179027fadfda2b143beccde42ce12e457a0f/ras_commander/ComputeResults.py#L185
+[ras-prj]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPrj.py
+[init]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPrj.py
+[plan-path]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[clear-geom]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/geom/GeomPreprocessor.py
+[run-flags]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPlan.py
+[preprocess]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPreprocess.py
+[tcu-status]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasTcu.py
+[tcu-accept]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasTcu.py
+[bco]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[logging]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[monitor]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasBco.py
+[terminate]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/RasPreprocess.py
+[result]: https://github.com/gpt-cmdr/ras-commander/blob/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander/ComputeResults.py
 
-[build-dockerfile]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/Dockerfile
-[build-controller]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/prepare.py
-[build-worker]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/windows_worker.py
-[build-exporter]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/bundle_profile.py
-[build-manifest]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/runtime-manifest.example.json
-[build-helper]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/profile_provenance_check_legacy.py
-[build-inputs]: https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/BUILD-INPUTS.md
+[build-dockerfile]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/Dockerfile
+[build-controller]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/prepare.py
+[build-worker]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/windows_worker.py
+[build-exporter]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/bundle_profile.py
+[build-manifest]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/runtime-manifest.example.json
+[build-helper]: https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/profile_provenance_check_legacy.py
+[build-inputs]: https://github.com/gpt-cmdr/ras2fim-2d/blob/codex/phase2-linux-wine-preprocessing/containers/hecras-prepare/BUILD-INPUTS.md
 
 ## Reproduce the input-format regression checks
 
-Run [test_preprocessing_inputs.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/test_preprocessing_inputs.py) from a Windows or Linux Docker host with a
+Run [test_preprocessing_inputs.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/test_preprocessing_inputs.py) from a Windows or Linux Docker host with a
 fresh external evidence directory. It makes separate disposable copies for LF,
 CRLF, mixed line endings and missing dependencies. The first three must retain
 the mesh and hydraulic tables; the missing-dependency case must fail without
@@ -313,5 +316,7 @@ python containers/hecras-prepare/test_preprocessing_inputs.py --image rascommand
 
 The source project must have sibling `source_terrain` and `projection` folders
 in its parent directory, as in `sample_data/sample_output/02_model_copies`.
-The image Dockerfile includes [model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/3c5011dbe150d8311e45598401b16645c6e61932/containers/hecras-prepare/model_checks.py) beside `windows_worker.py`;
+The image Dockerfile includes [model_checks.py](https://github.com/gpt-cmdr/ras2fim-2d/blob/dc60b219091e85bcb4564eca45313475c39ce58a/containers/hecras-prepare/model_checks.py) beside `windows_worker.py`;
 both are required build inputs. Run the same checks for each released runtime.
+
+[installed-package]: https://github.com/gpt-cmdr/ras-commander/tree/9e4217713e954236b0c16023e1815c6f2b7a5309/ras_commander
