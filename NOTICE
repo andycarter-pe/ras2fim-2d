@@ -1,0 +1,48 @@
+ras2fim-2d
+Copyright (c) 2026, The University of Texas at Austin. See LICENSE.md.
+Created by Andy Carter, PE, Center for Water and the Environment,
+University of Texas at Austin.
+
+
+Contributed code: optional healed terrain and mapping engine
+-------------------------------------------------------------
+
+Copyright (c) 2026, CLB Engineering Corporation.
+
+The files below were contributed by CLB Engineering Corporation and are
+distributed under the BSD 3-Clause License, on the same terms as LICENSE.md
+with "CLB Engineering Corporation" as the copyright holder. terrain_healer.py
+and rem_tiles.py are adapted with permission from CLB Engineering's FIM
+Commander revision c0aefd016a66de22e19258cf654bfd65e7d0890d.
+
+  src/terrain_healer.py
+  src/rem_tiles.py
+  src/healed_mapping_terrain.py
+  src/terrain_review.py
+  src/mapping_engine.py
+  src/native_mapping.py
+  the v2 additions in src/generate_depth_wsel_rasters_mp_05_v2.py,
+    src/generate_and_simplify_rasters_mp_06_v2.py and
+    src/prep_for_netcdf_mp_07_v2.py (the rest of those files is Andy
+    Carter's code under LICENSE.md)
+  tests/
+  doc/healed_mapping_terrain.md, doc/container_validation.md,
+    doc/native_mapping_engine_handoff.md
+  .github/workflows/healed-terrain.yml, .github/workflows/publish-container.yml
+
+
+Third-party packages (installed, not bundled in this repository)
+----------------------------------------------------------------
+
+  terrio 0.5.0 (Qiusheng Wu)                       MIT
+  ras-commander, commit 777c7746 (W. M. Katzenmeyer) MIT
+  ras-commander-fast-map 0.8.0                     MIT AND BSD-3-Clause
+                                                   (ships THIRD_PARTY_NOTICES.md)
+  ras-commander-fast-hdf 0.2.3                     MIT
+
+
+Data (mounted at run time, not included in the code or container)
+------------------------------------------------------------------
+
+TxDOT Road Elevation Model section DSMs: Liu et al. (2025),
+DOI 10.13139/ORNLNCCS/2574440, CC BY 4.0.

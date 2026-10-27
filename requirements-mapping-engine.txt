@@ -1,0 +1,10 @@
+# Public accelerated mapper; install in the prepared Python 3.14 geo environment.
+ras-commander[fim] @ https://github.com/gpt-cmdr/ras-commander/archive/777c7746ceb35fc3b1c29d3718935c9013ae009c.tar.gz
+ras-commander-fast-map==0.8.0
+ras-commander-fast-hdf==0.2.3
+
+# Existing Steps 6-7 progress reporting.
+tqdm>=4.66,<5
+
+# Existing Step4 calculations used to preserve native catalog window semantics.
+networkx==2.8.8

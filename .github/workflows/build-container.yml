@@ -1,0 +1,183 @@
+# Build and qualify the container on a GitHub runner, then attach it to a DRAFT release.
+# Publishing that release (by a person) runs publish-container.yml, which checks the
+# archive and image ID and pushes the same image to ghcr.io/<owner>/<repo>:<tag>.
+# This workflow itself pushes nothing to a registry.
+#
+# Start it by pushing a tag:  git tag healed-native-YYYYMMDD-rN && git push <remote> <tag>
+# (or with workflow_dispatch once this file is on the default branch).
+#
+# Contributed by CLB Engineering, 2026.10.27 (see NOTICE)
+name: Build and qualify container
+on:
+  push:
+    tags: ['healed-native-*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag for the image, for example healed-native-20261027-r6'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Build image
+        run: |
+          mkdir -p evidence
+          docker build -t "ras2fim-2d:$TAG" . 2>&1 | tee evidence/build.log
+
+      - name: Tests, imports and tools inside the image
+        run: |
+          docker run --rm "ras2fim-2d:$TAG" bash -c '
+            set -euo pipefail
+            python -m pip install -q pytest
+            cd /ras2fim-2d && python -m pytest -q -p no:cacheprovider
+            cd src
+            python - <<"PY"
+          import importlib, inspect, json, sys
+          from importlib.metadata import version, distribution
+          for name in ("generate_depth_wsel_rasters_mp_05", "generate_and_simplify_rasters_mp_06",
+                       "prep_for_netcdf_mp_07", "generate_depth_wsel_rasters_mp_05_v2",
+                       "generate_and_simplify_rasters_mp_06_v2", "prep_for_netcdf_mp_07_v2",
+                       "filter_netcdf_wsel_mp_08", "terrain_healer", "native_mapping"):
+              importlib.import_module(name)
+          from ras_commander import RasFim
+          assert "wsel_profiles" in inspect.signature(RasFim.map_sloping_profiles).parameters
+          url = json.loads(distribution("ras-commander").read_text("direct_url.json"))
+          assert "777c7746ceb35fc3b1c29d3718935c9013ae009c" in url["url"]
+          print(json.dumps({"python": sys.version, "ras_commander_source": url["url"],
+                            "packages": {n: version(n) for n in ("terrio", "ras-commander",
+                                "ras-commander-fast-map", "ras-commander-fast-hdf", "numpy",
+                                "pandas", "rasterio", "scipy", "gdal", "geopandas", "rioxarray")}}))
+          PY
+            python ras2fim-2d.py --help > /dev/null
+            python healed_mapping_terrain.py --help > /dev/null
+            command -v nccopy ras2fim-batch
+          ' 2>&1 | tee evidence/qualification.log
+
+      - name: Sample data, steps 5-8 with v1, v2 and fast_step05
+        run: |
+          # Andy's public sample (s3://rasfim-2d-sample); steps 00-04 are inputs
+          aws s3 sync --no-sign-request --only-show-errors s3://rasfim-2d-sample/sample_output/ sample/ \
+            --exclude '05_large_terrain/*' --exclude '06_simple_rasters/*'
+          mkdir -p results
+          docker run --rm -v "$PWD/sample:/sample:ro" -v "$PWD/results:/results" "ras2fim-2d:$TAG" bash -c '
+            set -euo pipefail
+            export PYTHONDONTWRITEBYTECODE=1
+            # v1 = the image source with the three _v2 imports switched back
+            cp -r /ras2fim-2d/src /tmp/src_v1
+            sed -i "s/_v2 import / import /" /tmp/src_v1/ras2fim-2d.py
+            grep -n "_mp_0[567]" /tmp/src_v1/ras2fim-2d.py
+            sed "s/^str_mapping_engine = legacy/str_mapping_engine = fast_step05/" \
+              /ras2fim-2d/src/config_global_windows.ini > /tmp/config_fast.ini
+            fn_run() {
+              rm -rf /tmp/run && mkdir /tmp/run
+              cp -r /sample/00_base_hecras /sample/01_model_hydrofabric /sample/02_model_copies \
+                    /sample/02b_prep_for_ras /sample/03_run_hdf /sample/04_wsel_and_hr /tmp/run/
+              # Step 6 workers can race to create this folder (check-then-makedirs in
+              # generate_and_simplify_rasters_mp_06.py, reported to Andy, not changed here)
+              mkdir -p /tmp/run/06_simple_rasters/01_wsel_rasters
+              (cd "$1" && python ras2fim-2d.py -i /tmp/run/00_base_hecras -o /tmp/run -c "$2" -f "(1,1,1)" -s "(5,8)")
+              mkdir -p "/results/$3"
+              cp -r /tmp/run/04_wsel_and_hr /tmp/run/05_large_terrain /tmp/run/06_simple_rasters "/results/$3/"
+            }
+            fn_run /tmp/src_v1 /ras2fim-2d/src/config_global_windows.ini v1
+            fn_run /ras2fim-2d/src /ras2fim-2d/src/config_global_windows.ini v2
+            fn_run /ras2fim-2d/src /tmp/config_fast.ini fast_step05
+            python - <<"PY"
+          import hashlib, json, os
+          import geopandas as gpd, numpy as np, xarray as xr
+          def files(root):
+              return sorted(os.path.relpath(os.path.join(d, f), root)
+                            for d, _, fs in os.walk(root) for f in fs)
+          def sha(p):
+              return hashlib.sha256(open(p, "rb").read()).hexdigest()
+          a, b = "/results/v1", "/results/v2"
+          fa, fb = files(a), files(b)
+          diffs = []
+          for rel in sorted(set(fa) | set(fb)):
+              pa, pb = os.path.join(a, rel), os.path.join(b, rel)
+              if rel not in fa or rel not in fb:
+                  diffs.append(rel + ": only in one run"); continue
+              if rel.endswith(".nc"):
+                  da, db = xr.open_dataset(pa), xr.open_dataset(pb)
+                  ka = {k: v for k, v in da.attrs.items() if "history" not in k}
+                  kb = {k: v for k, v in db.attrs.items() if "history" not in k}
+                  if not (da.identical(db.assign_attrs(da.attrs)) and str(ka) == str(kb)):
+                      diffs.append(rel + ": netcdf differs")
+              elif rel.endswith(".gpkg"):
+                  import pyogrio
+                  for lyr in [l[0] for l in pyogrio.list_layers(pa)]:
+                      if not gpd.read_file(pa, layer=lyr).equals(gpd.read_file(pb, layer=lyr)):
+                          diffs.append(rel + ": layer " + lyr + " differs")
+              elif sha(pa) != sha(pb):
+                  diffs.append(rel + ": bytes differ")
+          fast = {}
+          for nc in sorted(f for f in fa if f.startswith("06_simple_rasters/02_wsel_nc/")):
+              x = xr.open_dataset(os.path.join(a, nc)).wsel.values
+              y = xr.open_dataset(os.path.join("/results/fast_step05", nc)).wsel.values
+              fast[nc] = bool(x.shape == y.shape and np.array_equal(x, y, equal_nan=True))
+          out = {"v1_vs_v2_files": len(fa), "v1_vs_v2_differences": diffs,
+                 "v1_vs_v2": "MATCH" if not diffs else "DIFFERENT",
+                 "fast_step05_netcdf_wsel_equal_to_legacy": fast}
+          print(json.dumps(out, indent=2))
+          open("/results/sample-v1-v2.json", "w").write(json.dumps(out, indent=2) + "\n")
+          assert not diffs, "v2 with the shipped config must match v1"
+          PY
+          ' 2>&1 | tee evidence/sample-steps-5-8.log
+          cp results/sample-v1-v2.json evidence/
+
+      - name: Save image and attach to a draft release
+        run: |
+          ARCHIVE="ras2fim-2d-$TAG.tar.gz"
+          docker save "ras2fim-2d:$TAG" | gzip > "$ARCHIVE"
+          docker run --rm "ras2fim-2d:$TAG" bash -c \
+            'conda list -p /opt/ras2fim-env --json' > evidence/conda-list.json
+          docker run --rm "ras2fim-2d:$TAG" python -m pip freeze > evidence/pip-freeze.txt
+          git archive --format=tar.gz -o source.tar.gz HEAD
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          def sha(p):
+              h = hashlib.sha256()
+              with open(p, "rb") as f:
+                  for block in iter(lambda: f.read(8 << 20), b""):
+                      h.update(block)
+              return h.hexdigest()
+          tag = os.environ["TAG"]
+          archive = "ras2fim-2d-" + tag + ".tar.gz"
+          image = "ras2fim-2d:" + tag
+          inspect = json.loads(subprocess.check_output(["docker", "image", "inspect", image]))[0]
+          receipt = {
+              "schema": "ras2fim-2d-container-delivery/v1",
+              "image": image,
+              "image_id": inspect["Id"],
+              "image_bytes": inspect["Size"],
+              "archive_bytes": os.path.getsize(archive),
+              "archive_sha256": sha(archive),
+              "source_commit": os.environ["GITHUB_SHA"],
+              "source_archive_sha256": sha("source.tar.gz"),
+              "built_by": os.environ["GITHUB_SERVER_URL"] + "/" + os.environ["GITHUB_REPOSITORY"]
+                          + "/actions/runs/" + os.environ["GITHUB_RUN_ID"],
+              "sample_v1_vs_v2": json.load(open("evidence/sample-v1-v2.json"))["v1_vs_v2"],
+          }
+          open("delivery.json", "w").write(json.dumps(receipt, indent=2) + "\n")
+          print(json.dumps(receipt, indent=2))
+          PY
+          sha256sum "$ARCHIVE" source.tar.gz delivery.json evidence/* > SHA256SUMS
+          gh release create "$TAG" --draft --prerelease --target "$GITHUB_SHA" \
+            --title "$TAG" --notes "Container built and qualified by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Publish this release to push the image to GHCR (publish-container.yml)." \
+            "$ARCHIVE" source.tar.gz delivery.json SHA256SUMS evidence/*

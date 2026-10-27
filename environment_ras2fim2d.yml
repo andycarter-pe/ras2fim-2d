@@ -4,25 +4,33 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3.8.12
+  - python=3.14
 
   # Geospatial stack
   - gdal
   - rasterio
-  - geopandas=0.12.1
-  - fiona=1.8.22
+  - geopandas>=0.14,<2
+  - fiona>=1.9
   - pyproj
   - shapely
-  - rioxarray=0.13.1
+  - rioxarray>=0.15,<1
 
   # Scientific/data
-  - h5py=3.7.0
+  - h5py>=3.8
   - netcdf4
   - h5netcdf
-  - scipy=1.9.3
+  - scipy>=1.11
   - networkx=2.8.8
 
   # Other
   - matplotlib
   - tqdm
-  - pywin32
+  - pywin32  # Windows workstation; omit on Linux
+  - numpy<3
+  - pandas<3
+  - pip
+  - pip:
+      - terrio==0.5.0
+      - 'ras-commander[fim] @ https://github.com/gpt-cmdr/ras-commander/archive/777c7746ceb35fc3b1c29d3718935c9013ae009c.tar.gz'
+      - ras-commander-fast-map==0.8.0
+      - ras-commander-fast-hdf==0.2.3

@@ -1,0 +1,4 @@
+# Standalone healer runtime; Python 3.14. No private dependencies.
+terrio==0.5.0
+numpy>=1.26,<3
+scipy>=1.11,<2

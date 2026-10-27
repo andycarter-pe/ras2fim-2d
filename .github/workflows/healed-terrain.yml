@@ -1,0 +1,12 @@
+name: Mapping terrain integration
+on: [push, pull_request]
+jobs:
+  python314:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: python -m pip install pytest 'numpy<3' 'pandas<3' 'rasterio>=1.4,<2' -r requirements-healed-terrain.txt -r requirements-mapping-engine.txt
+      - run: python -m pytest

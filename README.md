@@ -10,7 +10,7 @@
 
 The workflow uses a "firehose" approach in which a series of constant-flow simulations is performed by applying flow to an internal HEC-RAS boundary condition named `Emitter1`. Flows are introduced near the upstream ends of the NWM NextGen hydrofabric catchments and the resulting inundation is clipped to the area associated with the corresponding NextGen `feature_id` (for example, `wb-2427467`).
 
-The resulting FIM library contains water-surface elevations (WSEL) indexed by flow rate (cfs). The output NetCDF files also contain the terrain used by HEC-RAS to compute the water-surface elevations.
+The resulting FIM library contains water-surface elevations (WSEL) indexed by flow rate (cfs). By default, the output NetCDF files also contain the model terrain. The optional healed-terrain mode embeds the restored mapping surface instead, while retaining the original hydraulic calculations.
 
 This project was developed in support of the National Weather Service under **Research Project NA22NWS4320003 / A25-0366-S018**.
 
@@ -27,7 +27,7 @@ This project was developed in support of the National Weather Service under **Re
 
 ## Technology
 
-- Python 3.8.12
+- Python 3.14
 - HEC-RAS 2D (v6.6 local Windows install; v6.5 containerized workers)
 - Docker
 - NetCDF
@@ -220,3 +220,20 @@ The output can be used as a library for rapidly retrieving flood inundation info
 # License
 
 See the repository license for terms of use.
+
+## Optional healed mapping terrain and accelerated mapping
+
+The Python 3.14 postprocessing container includes a standalone Terrio terrain healer
+and the public RasCommander Rust mapping engine. Healing and engine selection are
+independent and opt-in. See [the integration guide](doc/healed_mapping_terrain.md)
+for configuration, container builds and operation, QA, catalog defaults, and the
+native sloping catalog option.
+
+Steps 05-07 changes are in new `_v2` files; `ras2fim-2d.py` selects them by three
+imports, and Andy's original step files are unchanged. Published image (Python 3.14):
+
+```sh
+docker pull ghcr.io/gpt-cmdr/ras2fim-2d@sha256:9ee963e954fea8c87fb9df18693038576be26d2cfc0ddbf50ce676244e4ab5c3
+``` HEC-RAS inputs and hydraulic runs keep their
+original terrain. No FIM Commander package or private repository is required.
+The contributed code is BSD-3-Clause, copyright CLB Engineering Corporation; see [NOTICE](NOTICE).

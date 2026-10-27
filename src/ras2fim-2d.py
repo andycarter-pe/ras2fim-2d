@@ -10,6 +10,7 @@
 # Created by: Andy Carter, PE
 # 2025.01.08
 # Updated - 2026.09.07
+# Revised - 2026.10.27 -- steps 05-07 switched to _v2 (optional healed terrain / mapping engine)
 
 # ************************************************************
 import argparse
@@ -38,9 +39,9 @@ if platform.system() == "Windows":
 ##from run_hecras_windows_03 import fn_run_hec_ras_models
 from compute_max_wsel_and_stable_hr_04 import fn_compute_max_wsel_and_stable_hr
 from determine_fim_per_reach_04b import fn_determine_fims_per_reach
-from generate_depth_wsel_rasters_mp_05 import fn_generate_depth_wsel_rasters
-from generate_and_simplify_rasters_mp_06 import fn_extract_and_simplify_rasters
-from prep_for_netcdf_mp_07 import fn_prepare_netcdf_files
+from generate_depth_wsel_rasters_mp_05_v2 import fn_generate_depth_wsel_rasters
+from generate_and_simplify_rasters_mp_06_v2 import fn_extract_and_simplify_rasters
+from prep_for_netcdf_mp_07_v2 import fn_prepare_netcdf_files
 from filter_netcdf_wsel_mp_08 import fn_filter_netcdf
 # ************************************************************
 

@@ -1,0 +1,67 @@
+name: Publish verified container to GHCR
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    # Ordinary releases without a container delivery are unaffected.
+    if: contains(github.event.release.assets.*.name, 'delivery.json')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      REGISTRY_USER: ${{ github.actor }}
+    steps:
+      - name: Download the tested image and its receipt
+        run: |
+          gh release download "$RELEASE_TAG" --repo "$GH_REPO" \
+            --pattern 'ras2fim-2d-*.tar.gz' --pattern delivery.json
+      - name: Verify, load and publish the exact tested image
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          receipt = json.loads(pathlib.Path('delivery.json').read_text())
+          archives = list(pathlib.Path('.').glob('ras2fim-2d-*.tar.gz'))
+          if len(archives) != 1:
+              raise RuntimeError('Require exactly one Docker-save archive')
+          digest = hashlib.sha256()
+          with archives[0].open('rb') as stream:
+              for block in iter(lambda: stream.read(8 << 20), b''):
+                  digest.update(block)
+          if digest.hexdigest() != receipt['archive_sha256']:
+              raise RuntimeError('Container archive checksum mismatch')
+          subprocess.run(['docker', 'load', '-i', str(archives[0])], check=True)
+          source = receipt['image']
+          actual = subprocess.check_output(['docker', 'image', 'inspect', source,
+              '--format', '{{.Id}}'], text=True).strip()
+          if actual != receipt['image_id']:
+              raise RuntimeError('Loaded image differs from the tested image ID')
+          target = 'ghcr.io/' + os.environ['GH_REPO'].lower() + ':' + os.environ['RELEASE_TAG']
+          subprocess.run(['docker', 'login', 'ghcr.io', '-u', os.environ['REGISTRY_USER'],
+              '--password-stdin'], input=os.environ['GH_TOKEN'], text=True, check=True)
+          try:
+              subprocess.run(['docker', 'tag', source, target], check=True)
+              subprocess.run(['docker', 'push', target], check=True)
+              digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect',
+                  target, '--format', '{{json .RepoDigests}}'], text=True))
+              reference = next(d for d in digests if d.startswith(target.split(':')[0] + '@'))
+              publication = dict(image=target, digest_reference=reference,
+                  image_id=actual, source_commit=receipt['source_commit'])
+              pathlib.Path('registry-publication.json').write_text(json.dumps(publication, indent=2))
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+                  summary.write('Pull the verified image by digest:\n\n```sh\ndocker pull ' + reference + '\n```\n')
+              print(json.dumps(publication))
+          finally:
+              subprocess.run(['docker', 'logout', 'ghcr.io'], check=False)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: registry-publication
+          path: registry-publication.json
