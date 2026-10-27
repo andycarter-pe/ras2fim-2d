@@ -160,6 +160,25 @@ conda activate ras2fim2d
 python C:\Users\civil\dev\ras2fim-2d\src\ras2fim-2d.py -i D:\to_aws_20260908\HEC-RAS -o E:\mac_test_output_20260909 -c C:\Users\civil\dev\ras2fim-2d\src\config_global_windows.ini -f "(1,1,1)" -s "(2,2)"
 ```
 
+### Optional — Step 2b on a Linux Docker host (HEC-RAS through Wine)
+
+*Contributed by CLB Engineering Corporation. Off by default.*
+
+Step 2b normally runs HEC-RAS 6.6 on this Windows machine (`stage_hecras_for_linux_v66_02b.py`). As an alternative, `stage_hecras_for_linux_wine_02b.py` runs the same preprocessing (geometry, 2D property tables, `.p01.tmp.hdf`) in Linux/Wine containers on a Docker host reached over SSH, up to four at a time. Windows waits until every project has finished and its `.p01.tmp.hdf`, `.b01` and `.x01` pass checks, then stages them to `02b_prep_for_ras` and step 2c writes the same compute scripts as before.
+
+Requirements: SSH key access from Windows to the Linux host, Docker on that host, and an output folder both machines can see. To switch it on, edit `[03_run_hec_ras]` in `config_global_windows.ini`:
+
+```ini
+b_prepare_on_linux_wine = True
+str_linux_host = user@linux-host
+str_windows_share = E:\
+str_linux_share = /mnt/ras2fim-2d-work
+str_prepare_image = rascommander/hec-ras-wine-precompute_6.5@sha256:5de3b51455e7405ea0f85f1d9112c8232e41faaad74a4c13bd511fad8c8eda99
+str_prepare_version = 6.5
+```
+
+Then run the same Phase 2 command. Set `b_prepare_on_linux_wine = False` to go back to the Windows HEC-RAS 6.6 step. Image details, the other keys and the HEC-RAS Terms and Conditions for Use are in [containers/hecras-prepare/README.md](containers/hecras-prepare/README.md).
+
 ---
 
 ## Phase 3 — Step 3 (Windows batch: parallel HEC-RAS workers)

@@ -10,6 +10,8 @@
 # Created by: Andy Carter, PE
 # 2025.01.08
 # Updated - 2026.09.07
+# Revised - 2026.10.27 -- optional step 02b on a Linux Docker host through Wine
+#   ([03_run_hec_ras] b_prepare_on_linux_wine, default False); contributed by CLB Engineering
 
 # ************************************************************
 import argparse
@@ -24,6 +26,7 @@ from functools import partial
 import tqdm
 import platform
 from pathlib import Path
+import configparser
 
 # Import modules
 from copy_source_folder_00 import fn_copy_folder
@@ -33,6 +36,7 @@ from spawn_hecras_copies_emit_02 import fn_spawn_hecras_copies
 if platform.system() == "Windows":
     import win32com.client
     from stage_hecras_for_linux_v66_02b import fn_prepare_hecras_for_linux
+    from stage_hecras_for_linux_wine_02b import fn_prepare_hecras_for_linux as fn_prepare_hecras_for_linux_wine
     from create_hec_ras_scripts_for_linux_02c import fn_hec_ras_scripts_for_linux
     
 ##from run_hecras_windows_03 import fn_run_hec_ras_models
@@ -238,12 +242,27 @@ def fn_ras2fim_2d(str_source_folder,
             int_processes = 4 # number of HEC-RAS to run concurrently on Windows machine
             flt_timeout_sec = 900 # per-project timeout in seconds
             
-            fn_prepare_hecras_for_linux(str_config_file_path,
-                                        str_model_path_02,
-                                        str_model_path_02b,
-                                        int_processes,
-                                        flt_timeout_sec,
-                                        b_print_output)
+            # Optional: preprocess on a Linux Docker host through Wine instead
+            config_02b = configparser.ConfigParser()
+            config_02b.read(str_config_file_path)
+            b_prepare_on_linux_wine = False
+            if '03_run_hec_ras' in config_02b:
+                b_prepare_on_linux_wine = config_02b['03_run_hec_ras'].getboolean('b_prepare_on_linux_wine', fallback=False)
+            
+            if b_prepare_on_linux_wine:
+                fn_prepare_hecras_for_linux_wine(str_config_file_path,
+                                                 str_model_path_02,
+                                                 str_model_path_02b,
+                                                 int_processes,
+                                                 flt_timeout_sec,
+                                                 b_print_output)
+            else:
+                fn_prepare_hecras_for_linux(str_config_file_path,
+                                            str_model_path_02,
+                                            str_model_path_02b,
+                                            int_processes,
+                                            flt_timeout_sec,
+                                            b_print_output)
             
             # Step 02c -- create scripts to run HEC-RAS Linux Container (docker)
             fn_hec_ras_scripts_for_linux(str_model_path_02b, b_print_output)
