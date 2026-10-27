@@ -1,0 +1,18 @@
+# Contributed by CLB Engineering for Andy Carter, PE, 2026.10.27.
+# Files that Python, GDAL and coding agents create on a local machine.
+# sample_output/ is committed reference output and is not ignored.
+
+# Python byte-code
+__pycache__/
+*.pyc
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# GDAL side files written when a raster is opened (sample_output/ keeps its own)
+*.aux.xml
+!sample_output/**/*.aux.xml
+
+# Personal Claude Code notes and settings for this machine
+CLAUDE.local.md
+.claude/settings.local.json
